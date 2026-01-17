@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.IntakeConstants;
-import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -22,19 +21,15 @@ public class Intake extends SubsystemBase {
   public static final double TOLERANCE = IntakeConstants.TOLERANCE;
 
   // just here for the logging
-  @AutoLogOutput private double automaticSpeed = 0;
-
-  @AutoLogOutput private double manualSpeed = 0;
+  @AutoLogOutput private double speed = 0;
 
   private IntakeIO intakeIO;
   private IntakeIOInputsAutoLogged inputs;
 
   /**
    * @param intakeIO the hardware interface
-   * @param distanceSupplierMeters the distance supplier for when it goes automatic
    */
-  public Intake(IntakeIO intakeIO, DoubleSupplier distanceSupplierMeters) {
-    this.distanceSupplier = distanceSupplierMeters;
+  public Intake(IntakeIO intakeIO) {
     this.intakeIO = intakeIO;
     this.inputs = new IntakeIOInputsAutoLogged();
   }
@@ -56,8 +51,8 @@ public class Intake extends SubsystemBase {
   /**
    * @param speed the speed the flywheel will pid too
    */
-  public void setManualSpeed(double speed) {
-    this.manualSpeed = speed;
+  public void setSpeed(double speed) {
+    this.speed = speed;
   }
 
   /**
@@ -65,8 +60,7 @@ public class Intake extends SubsystemBase {
    *     calculated speed
    */
   public double getSpeedTarget() {
-    if (isManual) return manualSpeed;
-    return automaticSpeed;
+    return speed;
   }
 
   /**
@@ -83,8 +77,8 @@ public class Intake extends SubsystemBase {
    * @param speed the speed of the flywheel
    * @return the finished command
    */
-  public Command setManualSpeedCommand(double speed) {
-    return new InstantCommand(() -> this.setManualSpeed(speed));
+  public Command setSpeedCommand(double speed) {
+    return new InstantCommand(() -> this.setSpeed(speed));
   }
 
   /**
@@ -93,8 +87,8 @@ public class Intake extends SubsystemBase {
    * @param speed the speed it gets set to
    * @return the finished command
    */
-  public Command setManualSpeedCommandConsistentEnd(double speed) {
-    return new InstantCommand(() -> this.setManualSpeed(speed))
+  public Command setSpeedCommandConsistentEnd(double speed) {
+    return new InstantCommand(() -> this.setSpeed(speed))
         .andThen(new WaitUntilCommand(() -> this.isOnTarget()));
   }
 
