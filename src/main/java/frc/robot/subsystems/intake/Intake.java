@@ -21,12 +21,8 @@ public class Intake extends SubsystemBase {
   // this shouldn't be here but it is for now because we're probably gonna move this
   public static final double TOLERANCE = IntakeConstants.TOLERANCE;
 
-  private DoubleSupplier distanceSupplier;
-
   // just here for the logging
   @AutoLogOutput private double automaticSpeed = 0;
-
-  @AutoLogOutput private boolean isManual = true;
 
   @AutoLogOutput private double manualSpeed = 0;
 
@@ -57,16 +53,10 @@ public class Intake extends SubsystemBase {
 
   // SUBSYSTEM METHODS
 
-  /** Sets the robot to use the distance supplier to determine shooting speed */
-  public void setAutomatic() {
-    isManual = false;
-  }
-
   /**
    * @param speed the speed the flywheel will pid too
    */
   public void setManualSpeed(double speed) {
-    this.isManual = true;
     this.manualSpeed = speed;
   }
 
@@ -106,37 +96,6 @@ public class Intake extends SubsystemBase {
   public Command setManualSpeedCommandConsistentEnd(double speed) {
     return new InstantCommand(() -> this.setManualSpeed(speed))
         .andThen(new WaitUntilCommand(() -> this.isOnTarget()));
-  }
-
-  /**
-   * returns a command that revs up to shoot at the distance and ends immediately
-   *
-   * @return
-   */
-  public Command setAutomaticCommand() {
-    return new InstantCommand(() -> this.setAutomatic());
-  }
-
-  /**
-   * returns a command that revs up to shoot at the distance then ends when it reaches that point
-   *
-   * @return
-   */
-  public Command setAutomaticCommandConsistentEnd() {
-    return new InstantCommand(() -> this.setAutomatic())
-        .andThen(new WaitUntilCommand(() -> this.isOnTarget()));
-  }
-
-  // HELPER METHODS
-  /**
-   * gets the needed speed based on distance away. Right now this is linear bc idrk what we're gonna
-   * do for this yet. Look into 2024 reefscape where we had an algorithm from setpoints for ideas
-   *
-   * @param distance
-   * @return
-   */
-  private double getSpeedFromDistance(double distance) {
-    return distance * 10;
   }
 
   // the constants here should probably be more and move but that's later when this is transferred
