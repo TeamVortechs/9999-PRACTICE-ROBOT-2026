@@ -10,6 +10,8 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -178,6 +180,19 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    controller
+        .leftTrigger()
+        .whileTrue(
+            DriveCommands.joystickDriveLookAtPose(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                drive::getPose,
+                () -> // target your own team's hub
+                (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
+                        ? Constants.TargetPoses.HUB_BLUE_POSE2D
+                        : Constants.TargetPoses.HUB_RED_POSE2D)));
   }
 
   /**
