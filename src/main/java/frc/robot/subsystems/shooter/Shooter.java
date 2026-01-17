@@ -46,7 +46,7 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     shooterIO.updateInputs(inputs);
-    Logger.processInputs("detection", inputs);
+    Logger.processInputs("shooter", inputs);
 
     // calculate speed that automatically updates with distance
     automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());

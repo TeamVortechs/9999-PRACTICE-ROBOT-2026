@@ -43,7 +43,7 @@ public class ShooterSimulationIO implements ShooterIO {
     // no clue if this works... but it's in last years arm code, so i used the set voltage
 
     // rollerMotorsSim.setInputVoltage(speed * 12); // lol i hope that works
-    setVoltage(speed * 12);
+    setVoltage(speed / 502.747253);
   }
 
   @Override

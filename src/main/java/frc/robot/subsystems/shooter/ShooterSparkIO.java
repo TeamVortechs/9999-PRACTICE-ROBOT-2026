@@ -6,10 +6,15 @@ import com.revrobotics.spark.SparkMax;
 import frc.robot.Constants;
 
 public class ShooterSparkIO implements ShooterIO {
-  final SparkMax m_motor = new SparkMax(Constants.ShooterConstants.ID, MotorType.kBrushed);
-  private RelativeEncoder m_encoder = m_motor.getEncoder();
+  private final SparkMax m_motor;
+  private final RelativeEncoder m_encoder;
   private final double targetSpeed = 0;
   private final boolean isOnTarget = false;
+
+  public ShooterSparkIO(int id) {
+    m_motor = new SparkMax(id, MotorType.kBrushed);
+    m_encoder = m_motor.getEncoder();
+  }
 
   public void updateInputs(ShooterIOInputsAutoLogged inputs) {
     inputs.amps = m_motor.getOutputCurrent();

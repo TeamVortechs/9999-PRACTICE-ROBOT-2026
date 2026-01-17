@@ -24,6 +24,11 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterIO;
+import frc.robot.subsystems.shooter.ShooterRotationManager;
+import frc.robot.subsystems.shooter.ShooterSimulationIO;
+import frc.robot.subsystems.shooter.ShooterSparkIO;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -35,6 +40,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Shooter shooter;
+  private final ShooterRotationManager shooterRotationManager;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -57,6 +64,13 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
+        shooterRotationManager =
+            new ShooterRotationManager(() -> new Pose2d(), () -> drive.getPose());
+        shooter =
+            new Shooter(
+                new ShooterSparkIO(Constants.ShooterConstants.ID),
+                () -> shooterRotationManager.getDistance());
+
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
         // implementations
@@ -77,6 +91,7 @@ public class RobotContainer {
         break;
 
       case SIM:
+
         // Sim robot, instantiate physics sim IO implementations
         drive =
             new Drive(
@@ -85,6 +100,11 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+
+        shooterRotationManager =
+            new ShooterRotationManager(() -> new Pose2d(), () -> drive.getPose());
+        shooter =
+            new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         break;
 
       default:
@@ -96,6 +116,9 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        shooterRotationManager =
+            new ShooterRotationManager(() -> new Pose2d(), () -> drive.getPose());
+        shooter = new Shooter(new ShooterIO() {}, () -> shooterRotationManager.getDistance());
         break;
     }
 
@@ -160,6 +183,8 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+    controller.y().whileTrue(shooter.setManualSpeedCommand(0.25));
+    controller.y().onFalse(shooter.setManualSpeedCommand(0));
   }
 
   /**
