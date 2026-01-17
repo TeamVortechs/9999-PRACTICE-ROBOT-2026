@@ -37,4 +37,14 @@ public final class Constants {
     public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
     public static final double TOLERANCE = 0.1;
   }
+
+  // copied directly from ShooterConstants
+  public class IntakeConstants {
+    public static final double SIM_TOLERANCE = 0.5;
+
+    // used in Shooter.java
+    public static final double RAMP_RATE_VOLTS_SYSID = 0.25;
+    public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
+    public static final double TOLERANCE = 0.1;
+  }
 }

@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants.ShooterConstants;
+import frc.robot.Constants.IntakeConstants;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -19,7 +19,7 @@ import org.littletonrobotics.junction.Logger;
 public class Intake extends SubsystemBase {
 
   // this shouldn't be here but it is for now because we're probably gonna move this
-  public static final double TOLERANCE = ShooterConstants.TOLERANCE;
+  public static final double TOLERANCE = IntakeConstants.TOLERANCE;
 
   private DoubleSupplier distanceSupplier;
 
@@ -30,29 +30,29 @@ public class Intake extends SubsystemBase {
 
   @AutoLogOutput private double manualSpeed = 0;
 
-  private IntakeIO shooterIO;
+  private IntakeIO intakeIO;
   private IntakeIOInputsAutoLogged inputs;
 
   /**
    * @param intakeIO the hardware interface
    * @param distanceSupplierMeters the distance supplier for when it goes automatic
    */
-  public Intake(ShooterIO intakeIO, DoubleSupplier distanceSupplierMeters) {
+  public Intake(IntakeIO intakeIO, DoubleSupplier distanceSupplierMeters) {
     this.distanceSupplier = distanceSupplierMeters;
     this.intakeIO = intakeIO;
-    this.inputs = new ShooterIOInputsAutoLogged();
+    this.inputs = new IntakeIOInputsAutoLogged();
   }
 
   @Override
   public void periodic() {
-    shooterIO.updateInputs(inputs);
+    intakeIO.updateInputs(inputs);
     Logger.processInputs("detection", inputs);
 
     // calculate speed that automatically updates with distance
     automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
 
     double speed = getSpeedTarget();
-    shooterIO.setSpeed(speed);
+    intakeIO.setSpeed(speed);
   }
 
   // SUBSYSTEM METHODS
@@ -83,7 +83,7 @@ public class Intake extends SubsystemBase {
    * @return wether the speed is the target speed
    */
   public boolean isOnTarget() {
-    return shooterIO.isOnTarget();
+    return intakeIO.isOnTarget();
   }
 
   // COMMANDS
@@ -152,16 +152,16 @@ public class Intake extends SubsystemBase {
     SysIdRoutine m_SysIdRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(
-                Volts.of(ShooterConstants.RAMP_RATE_VOLTS_SYSID)
+                Volts.of(IntakeConstants.RAMP_RATE_VOLTS_SYSID)
                     .per(Seconds), // Ramp Rate in Volts / Seconds
-                Volts.of(ShooterConstants.DYNAMIC_STEP_VOLTS_SYSID), // Dynamic Step Voltage
+                Volts.of(IntakeConstants.DYNAMIC_STEP_VOLTS_SYSID), // Dynamic Step Voltage
                 null, // Use default timeout (10 s)
                 (state) ->
                     SignalLogger.writeString(
                         "state", state.toString()) // Log state with Phoenix SignalLogger class
                 ),
             new SysIdRoutine.Mechanism(
-                (volts) -> shooterIO.setVoltage(volts.in(Volts)), null, this));
+                (volts) -> intakeIO.setVoltage(volts.in(Volts)), null, this));
     return m_SysIdRoutine;
   }
 
