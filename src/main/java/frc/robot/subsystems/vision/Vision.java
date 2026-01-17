@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
@@ -105,6 +106,10 @@ public class Vision extends SubsystemBase {
                 || observation.pose().getX() > aprilTagLayout.getFieldLength()
                 || observation.pose().getY() < 0.0
                 || observation.pose().getY() > aprilTagLayout.getFieldWidth();
+        
+        // if we're in testing mode, accept all poses so that we can have properly logged robot data
+        // use "RobotPosesAccepted or RobotPosesRejected" in AdvantageScope to see which ones are good in normal operation
+        if (DriverStation.isTest()) {rejectPose = false;}
 
         // Add pose to log
         robotPoses.add(observation.pose());
