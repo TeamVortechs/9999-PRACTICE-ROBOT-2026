@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.subsystems.intake;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
@@ -16,7 +16,7 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Shooter extends SubsystemBase {
+public class Intake extends SubsystemBase {
 
   // this shouldn't be here but it is for now because we're probably gonna move this
   public static final double TOLERANCE = ShooterConstants.TOLERANCE;
@@ -30,16 +30,16 @@ public class Shooter extends SubsystemBase {
 
   @AutoLogOutput private double manualSpeed = 0;
 
-  private ShooterIO shooterIO;
-  private ShooterIOInputsAutoLogged inputs;
+  private IntakeIO shooterIO;
+  private IntakeIOInputsAutoLogged inputs;
 
   /**
-   * @param shooterIO the hardware interface
+   * @param intakeIO the hardware interface
    * @param distanceSupplierMeters the distance supplier for when it goes automatic
    */
-  public Shooter(ShooterIO shooterIO, DoubleSupplier distanceSupplierMeters) {
+  public Intake(ShooterIO intakeIO, DoubleSupplier distanceSupplierMeters) {
     this.distanceSupplier = distanceSupplierMeters;
-    this.shooterIO = shooterIO;
+    this.intakeIO = intakeIO;
     this.inputs = new ShooterIOInputsAutoLogged();
   }
 
