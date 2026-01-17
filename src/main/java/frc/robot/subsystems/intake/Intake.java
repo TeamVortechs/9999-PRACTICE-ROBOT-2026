@@ -37,7 +37,7 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     intakeIO.updateInputs(inputs);
-    Logger.processInputs("detection", inputs);
+    Logger.processInputs("intake", inputs);
 
     // calculate speed that automatically updates with distance
     // automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());

@@ -2,12 +2,15 @@ package frc.robot.subsystems.intake;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import frc.robot.Constants;
 
 public class IntakeSparkIO implements IntakeIO {
-  final SparkMax m_motor = new SparkMax(Constants.IntakeConstants.ID, MotorType.kBrushed);
+  final SparkMax m_motor;
   private final double targetSpeed = 0;
   private final boolean isOnTarget = false;
+
+  public IntakeSparkIO(int id) {
+    m_motor = new SparkMax(id, MotorType.kBrushed);
+  }
 
   public void updateInputs(IntakeIOInputsAutoLogged inputs) {
     inputs.amps = m_motor.getOutputCurrent();

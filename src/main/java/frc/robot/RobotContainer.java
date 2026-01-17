@@ -24,6 +24,10 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.intake.IntakeIO;
+import frc.robot.subsystems.intake.IntakeSimulationIO;
+import frc.robot.subsystems.intake.IntakeSparkIO;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -35,6 +39,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Intake intake;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -49,6 +54,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
+        intake = new Intake(new IntakeSparkIO(0));
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -78,6 +84,7 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
+        intake = new Intake(new IntakeSimulationIO());
         drive =
             new Drive(
                 new GyroIO() {},
@@ -88,6 +95,7 @@ public class RobotContainer {
         break;
 
       default:
+        intake = new Intake(new IntakeIO() {});
         // Replayed robot, disable IO implementations
         drive =
             new Drive(
@@ -160,7 +168,13 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
-  }
+
+    controller
+        .y().whileTrue(intake.setSpeedCommand(0.25));
+
+    controller.y().onFalse(intake.setSpeedCommand(0));
+          
+    }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
