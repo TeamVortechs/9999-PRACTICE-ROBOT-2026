@@ -60,6 +60,7 @@ public class IntakeSimulationIO implements IntakeIO {
     return rollerMotorsSim.getAngularVelocityRPM();
   }
 
+  // possibly completely unnecessary for intake?
   @Override
   public boolean isOnTarget() {
     return targetSpeed == getSpeed();

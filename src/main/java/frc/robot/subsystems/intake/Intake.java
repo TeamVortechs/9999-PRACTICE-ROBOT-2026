@@ -49,7 +49,7 @@ public class Intake extends SubsystemBase {
     Logger.processInputs("detection", inputs);
 
     // calculate speed that automatically updates with distance
-    automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
+    // automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
 
     double speed = getSpeedTarget();
     intakeIO.setSpeed(speed);
