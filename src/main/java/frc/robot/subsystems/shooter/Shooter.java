@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -33,6 +34,9 @@ public class Shooter extends SubsystemBase {
 
   private ShooterIO shooterIO;
   private ShooterIOInputsAutoLogged inputs;
+
+  // TO DO: add values to table
+  private final InterpolatingDoubleTreeMap distToSpeedTable = new InterpolatingDoubleTreeMap();
 
   /**
    * @param shooterIO the hardware interface
@@ -140,14 +144,13 @@ public class Shooter extends SubsystemBase {
 
   // HELPER METHODS
   /**
-   * gets the needed speed based on distance away. Right now this is linear bc idrk what we're gonna
-   * do for this yet. Look into 2024 reefscape where we had an algorithm from setpoints for ideas
+   * uses InterpolatingDoubleTreeMap to deduce speed to output as a function of distance
    *
-   * @param distance
+   * @param distance dist from goal to shoot into
    * @return
    */
   private double getSpeedFromDistance(double distance) {
-    return distance * 10;
+    return distToSpeedTable.get(distance);
   }
 
   // the constants here should probably be more and move but that's later when this is transferred
