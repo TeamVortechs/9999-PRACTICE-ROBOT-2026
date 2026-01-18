@@ -11,6 +11,9 @@ import frc.robot.subsystems.drive.Drive;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
+/*
+ * THIS CODE IS REALLY BAD, FOR NOW IT'S GONNA STAY LIKE THIS.
+ */
 public class ShooterRotationManager {
   private Supplier<Pose2d> targetPose;
   private Drive drive;
@@ -34,6 +37,8 @@ public class ShooterRotationManager {
   // logs all of the values from this. Should be called repeatedly
   public void log() {
     // all of these methods automatically log values
+    currentRadians = drive.getRotation().getRadians();
+    targetRadians = getHeading().getRadians();
     getDistance();
     getHeading();
     isOriented();
@@ -46,20 +51,21 @@ public class ShooterRotationManager {
    */
   public double getDistance() {
     distance =
-        getTargetPoseLeaded().getTranslation().getDistance(getCurPoseLeaded().getTranslation());
+        getEffectiveTarget().getTranslation().getDistance(getPoseAtRelease().getTranslation());
 
     return distance;
   }
 
   /**
-   * Get the heading from target pose to the robot pose(FIELD CENTRIC)
+   * Get the heading from robot pose to target pose(FIELD CENTRIC)
    *
    * @return field centric heading
    */
   public Rotation2d getHeading() {
     // makes it so the robot will rotate towards where it is moving when driving to the pose
+        //im not sure if this should be current or predicted drive, I'll ask
     Translation2d delta =
-        getTargetPoseLeaded().getTranslation().minus(getCurPoseLeaded().getTranslation());
+        getEffectiveTarget().getTranslation().minus(drive.getPose().getTranslation());
 
     Rotation2d heading = new Rotation2d(delta.getX(), delta.getY());
 
@@ -75,7 +81,7 @@ public class ShooterRotationManager {
    */
   public Rotation2d getRobotRelativeRotation() {
     Rotation2d heading = getHeading();
-    Rotation2d robotRotation = getCurPoseLeaded().getRotation();
+    Rotation2d robotRotation = getPoseAtRelease().getRotation();
 
     return heading.minus(robotRotation);
   }
@@ -109,11 +115,11 @@ public class ShooterRotationManager {
    */
   public boolean isOriented() {
 
-    targetRadians = getHeading().getRadians();
-    currentRadians = getCurPoseLeaded().getRotation().getRadians();
+    //im not sure if this should be current or predicted drive, I'll ask
+    Rotation2d error = getHeading().minus(drive.getRotation());
 
     onTarget =
-        Math.abs(targetRadians - currentRadians) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
+        Math.abs(error.getRadians()) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
 
     return onTarget;
   }
@@ -125,50 +131,52 @@ public class ShooterRotationManager {
    * @return
    */
   @AutoLogOutput
-  public Pose2d getCurPoseLeaded() {
+  public Pose2d getPoseAtRelease() {
     Pose2d firstPose = drive.getPose();
 
     // logs the unfiltered pose so we can see the difference
     unFilteredCurrentPose = firstPose;
 
-    ChassisSpeeds chassisSpeeds = drive.getChassisSpeeds();
+    ChassisSpeeds fieldSpeeds =
+    ChassisSpeeds.fromRobotRelativeSpeeds(drive.getChassisSpeeds(), drive.getRotation());
 
     // this scaling factor is a constnat we'll just need to test for. We can change it depending on
     // if the shot is compensation to much or not enough. We can also make it zero to remove it
-    ChassisSpeeds chassisSpeedsScaled =
-        chassisSpeeds.times(ShooterConstants.KRELEASE_POSE_PREDICTION_SEC);
 
-    Transform2d speedsScaledTrans =
-        new Transform2d(
-            chassisSpeedsScaled.vxMetersPerSecond,
-            chassisSpeedsScaled.vyMetersPerSecond,
-            new Rotation2d());
-    Pose2d updatedPose = firstPose.plus(speedsScaledTrans);
+    double dt = ShooterConstants.KRELEASE_POSE_PREDICTION_SEC;
+
+    Rotation2d predictedRot =
+    firstPose.getRotation().plus(new Rotation2d(fieldSpeeds.omegaRadiansPerSecond * dt));
+
+    Pose2d updatedPose =
+        new Pose2d(
+            firstPose.getX() + fieldSpeeds.vxMetersPerSecond * dt,
+            firstPose.getY() + fieldSpeeds.vyMetersPerSecond * dt,
+            predictedRot);
 
     return updatedPose;
   }
 
   @AutoLogOutput
-  public Pose2d getTargetPoseLeaded() {
+  public Pose2d getEffectiveTarget() {
     Pose2d firstPose = targetPose.get();
 
     // logs the unfiltered pose so we can see the difference
     unFilteredTargetPose = firstPose;
 
-    ChassisSpeeds chassisSpeeds = drive.getChassisSpeeds();
+    ChassisSpeeds fieldSpeeds =
+    ChassisSpeeds.fromRobotRelativeSpeeds(drive.getChassisSpeeds(), drive.getRotation());
 
     // this scaling factor is a constnat we'll just need to test for. We can change it depending on
     // if the shot is compensation to much or not enough. We can also make it zero to remove it
-    ChassisSpeeds chassisSpeedsScaled =
-        chassisSpeeds.times(ShooterConstants.KFLIGHT_COMPENSATION_SEC);
+    //it is negative to make it minus in the final equation
+    double dt = ShooterConstants.KFLIGHT_COMPENSATION_SEC;
+    Pose2d updatedTarget =
+        new Pose2d(
+            firstPose.getX() - fieldSpeeds.vxMetersPerSecond * dt,
+            firstPose.getY() - fieldSpeeds.vyMetersPerSecond * dt,
+            firstPose.getRotation());
 
-    Transform2d speedsScaledTrans =
-        new Transform2d(
-            chassisSpeedsScaled.vxMetersPerSecond,
-            chassisSpeedsScaled.vyMetersPerSecond,
-            new Rotation2d());
-    Pose2d updatedPose = firstPose.plus(speedsScaledTrans);
-
-    return updatedPose;
+    return updatedTarget;
   }
 }

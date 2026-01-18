@@ -52,7 +52,9 @@ public final class Constants {
     // we should test by looking at values. this can also be a distance lookup table. This corrects
     // for robot speed by changing the target location. This constant is supposed ot emmulate fligth
     // time
-    public static final double KFLIGHT_COMPENSATION_SEC = 0.1;
+    public static final double KFLIGHT_COMPENSATION_SEC = 0.2;
+
+    public static final double K_JOYSTICK_WHEN_SHOOTING = 0.7;
   }
 
   // copied directly from ShooterConstants

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
@@ -167,8 +168,8 @@ public class RobotContainer {
     Command orientDrive =
         DriveCommands.joystickDriveAtAngle(
             drive,
-            () -> -controller.getLeftY() * 0.5,
-            () -> -controller.getLeftX() * 0.5,
+            () -> -controller.getLeftY() * ShooterConstants.K_JOYSTICK_WHEN_SHOOTING,
+            () -> -controller.getLeftX() * ShooterConstants.K_JOYSTICK_WHEN_SHOOTING,
             () -> shooterRotationManager.getHeading());
 
     // accelerate shooter to target speed(determined by distance), orient shooter, then start the
