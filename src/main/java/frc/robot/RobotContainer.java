@@ -33,9 +33,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterRotationManager;
 import frc.robot.subsystems.shooter.ShooterSimulationIO;
 import frc.robot.subsystems.shooter.ShooterSparkIO;
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -74,8 +72,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        shooterRotationManager =
-            new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooterRotationManager = new ShooterRotationManager(targetPose, () -> drive.getPose());
         shooter = new Shooter(new ShooterSparkIO(), () -> shooterRotationManager.getDistance());
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
@@ -107,8 +104,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        shooterRotationManager =
-            new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooterRotationManager = new ShooterRotationManager(targetPose, () -> drive.getPose());
         shooter =
             new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         break;
@@ -123,8 +119,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        shooterRotationManager =
-            new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooterRotationManager = new ShooterRotationManager(targetPose, () -> drive.getPose());
         shooter =
             new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         break;
@@ -168,6 +163,7 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
+    // decrease power of controller, orient shooter face targetPose
     Command orientDrive =
         DriveCommands.joystickDriveAtAngle(
             drive,
@@ -175,22 +171,17 @@ public class RobotContainer {
             () -> -controller.getLeftX() * 0.5,
             () -> shooterRotationManager.getHeading());
 
-    // this is for mode 2, where you can shoot at any distance
-    // requirements before shooting
-    BooleanSupplier isAlignned = () -> shooterRotationManager.isOriented();
-    BooleanSupplier atSpeed = () -> shooter.isOnTarget();
-
+    // accelerate shooter to target speed(determined by distance), orient shooter, then start the
+    // feeder to shoot
     Command shootCommand =
         shooter
             .setAutomaticCommandConsistentEnd()
             .andThen(new WaitUntilCommand(() -> shooterRotationManager.isOriented()))
             .andThen(feeder.setSpeedRunCommand(0.25));
 
-    Command shootSequence =
-        Commands.sequence(
-            Commands.parallel(
-                orientDrive, // face towards goal
-                shootCommand));
+    // always orient drive and shoot at the same time... might be a little sloppy but a majority of
+    // balls will make it
+    Command shootSequence = Commands.parallel(orientDrive, shootCommand);
 
     controller.leftTrigger().whileTrue(shootSequence);
 
@@ -218,15 +209,16 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    // controller.y().onFalse(feeder.setSpeedCommand(0));
-
     shooter.setDefaultCommand(
         shooter.setManualSpeedRunCommand(
-            0.25)); // make shooter go to this speed when it's not being used
+            Constants.ShooterConstants
+                .DEFAULT_SPEED)); // make shooter go to this speed when it's not being used
 
     feeder.setDefaultCommand(feeder.setSpeedRunCommand(0));
 
-    controller.y().whileTrue(shooter.setManualSpeedRunCommand(0.5));
+    controller
+        .y()
+        .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.BOOSTED_SPEED));
   }
 
   /**

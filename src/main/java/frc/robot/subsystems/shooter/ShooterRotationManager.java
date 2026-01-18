@@ -45,7 +45,6 @@ public class ShooterRotationManager {
     Translation2d delta = targetPose.get().getTranslation().minus(robotPose.get().getTranslation());
 
     Rotation2d heading = new Rotation2d(delta.getX(), delta.getY());
-    
 
     getDistance();
 
@@ -96,18 +95,18 @@ public class ShooterRotationManager {
     targetRadians = getHeading().getRadians();
     currentRadians = robotPose.get().getRotation().getRadians();
 
-    onTarget = Math.abs(targetRadians - currentRadians)
-        < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
+    onTarget =
+        Math.abs(targetRadians - currentRadians) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
 
     return onTarget;
   }
-  
- /**
+
+  /**
    * setter for target pose
    *
    * @param newTargetPose the new target pose
    */
-  public void setTargetPose(Supplier<Pose2d> newTargetPose){
+  public void setTargetPose(Supplier<Pose2d> newTargetPose) {
     targetPose = newTargetPose;
   }
 }

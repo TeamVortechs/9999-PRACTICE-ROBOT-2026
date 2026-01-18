@@ -47,7 +47,6 @@ public class FeederSimulationIO implements FeederIO {
     // rollerMotorsSim.setInputVoltage(speed * 12); // lol i hope that works
     setVoltage(speed / 502.747);
     targetSpeed = speed;
-
   }
 
   @Override

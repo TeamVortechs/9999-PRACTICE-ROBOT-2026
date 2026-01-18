@@ -40,6 +40,10 @@ public final class Constants {
     public static final int ID = 1;
 
     public static final double ORIENTATION_TOLERANCE = .05;
+
+    public static final double DEFAULT_SPEED = .25; // speed intake/shooter run at default
+    // speed intake/shooter boosts to
+    public static final double BOOSTED_SPEED = .5;
   }
 
   // copied directly from ShooterConstants
