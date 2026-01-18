@@ -14,10 +14,10 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.commands.ChargeShooterWhenNeededCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeedWhenValidCommand;
 import frc.robot.generated.TunerConstants;
@@ -182,8 +182,13 @@ public class RobotContainer {
     //         .andThen(feeder.setSpeedRunCommand(0.25));
 
     // always orient drive and shoot at the same time... might be a little sloppy but a majority of
+
+    Command feedWhenValid =
+        new FeedWhenValidCommand(feeder, controller, shooter, shooterRotationManager);
+
     // balls will make it
-    Command shootSequence = Commands.parallel(orientDrive, shooter.setAutomaticCommand(), new FeedWhenValidCommand(feeder, controller, shooter, shooterRotationManager));
+    Command shootSequence =
+        Commands.parallel(orientDrive, shooter.setAutomaticCommand(), feedWhenValid);
 
     controller.leftTrigger().whileTrue(shootSequence);
 
@@ -211,16 +216,15 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    shooter.setDefaultCommand(
-        shooter.setManualSpeedRunCommand(
-            Constants.ShooterConstants
-                .DEFAULT_SPEED)); // make shooter go to this speed when it's not being used
+    shooter.setDefaultCommand(new ChargeShooterWhenNeededCommand(shooter, () -> drive.getPose())); // make shooter go to this speed when it's not being used
 
     feeder.setDefaultCommand(feeder.setSpeedRunCommand(0));
 
     controller
-        .y()
-        .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.BOOSTED_SPEED));
+        .rightTrigger()
+        .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED));
+
+    controller.leftBumper().whileTrue(shooter.setAutomaticCommandRun());
   }
 
   /**

@@ -43,7 +43,10 @@ public final class Constants {
 
     public static final double DEFAULT_SPEED = .25; // speed intake/shooter run at default
     // speed intake/shooter boosts to
-    public static final double BOOSTED_SPEED = .5;
+    public static final double INTAKE_SPEED = .5;
+
+    public static final double X_POSE_TO_CHARGE = 6.5;
+    public static final double PERCENTAGE_OF_DISTANCE_WHEN_CHARGING = 0.6;
 
     // the time it takes between feeding and actual robot shoot. This is used to lead the robot
     // pose. Should be about 0.08 - 0.18 s
@@ -56,8 +59,7 @@ public final class Constants {
 
     public static final double K_JOYSTICK_WHEN_SHOOTING = 0.5;
 
-
-    //the time that the feeder waits before shooting once it is valis
+    // the time that the feeder waits before shooting once it is valis
     public static final double VALIDITY_DEBOUNCE_TIME_SEC = 0.2;
   }
 

@@ -2,7 +2,6 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
@@ -63,7 +62,7 @@ public class ShooterRotationManager {
    */
   public Rotation2d getHeading() {
     // makes it so the robot will rotate towards where it is moving when driving to the pose
-        //im not sure if this should be current or predicted drive, I'll ask
+    // im not sure if this should be current or predicted drive, I'll ask
     Translation2d delta =
         getEffectiveTarget().getTranslation().minus(drive.getPose().getTranslation());
 
@@ -115,11 +114,10 @@ public class ShooterRotationManager {
    */
   public boolean isOriented() {
 
-    //im not sure if this should be current or predicted drive, I'll ask
+    // im not sure if this should be current or predicted drive, I'll ask
     Rotation2d error = getHeading().minus(drive.getRotation());
 
-    onTarget =
-        Math.abs(error.getRadians()) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
+    onTarget = Math.abs(error.getRadians()) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
 
     return onTarget;
   }
@@ -138,7 +136,7 @@ public class ShooterRotationManager {
     unFilteredCurrentPose = firstPose;
 
     ChassisSpeeds fieldSpeeds =
-    ChassisSpeeds.fromRobotRelativeSpeeds(drive.getChassisSpeeds(), drive.getRotation());
+        ChassisSpeeds.fromRobotRelativeSpeeds(drive.getChassisSpeeds(), drive.getRotation());
 
     // this scaling factor is a constnat we'll just need to test for. We can change it depending on
     // if the shot is compensation to much or not enough. We can also make it zero to remove it
@@ -146,7 +144,7 @@ public class ShooterRotationManager {
     double dt = ShooterConstants.KRELEASE_POSE_PREDICTION_SEC;
 
     Rotation2d predictedRot =
-    firstPose.getRotation().plus(new Rotation2d(fieldSpeeds.omegaRadiansPerSecond * dt));
+        firstPose.getRotation().plus(new Rotation2d(fieldSpeeds.omegaRadiansPerSecond * dt));
 
     Pose2d updatedPose =
         new Pose2d(
@@ -165,11 +163,11 @@ public class ShooterRotationManager {
     unFilteredTargetPose = firstPose;
 
     ChassisSpeeds fieldSpeeds =
-    ChassisSpeeds.fromRobotRelativeSpeeds(drive.getChassisSpeeds(), drive.getRotation());
+        ChassisSpeeds.fromRobotRelativeSpeeds(drive.getChassisSpeeds(), drive.getRotation());
 
     // this scaling factor is a constnat we'll just need to test for. We can change it depending on
     // if the shot is compensation to much or not enough. We can also make it zero to remove it
-    //it is negative to make it minus in the final equation
+    // it is negative to make it minus in the final equation
     double dt = ShooterConstants.KFLIGHT_COMPENSATION_SEC;
     Pose2d updatedTarget =
         new Pose2d(

@@ -27,10 +27,14 @@ public class Shooter extends SubsystemBase {
 
   // just here for the logging
   @AutoLogOutput private double automaticSpeed = 0;
+  @AutoLogOutput private double scaledAutomaticSpeed = 0;
+  @AutoLogOutput private double automaticSpeedScalar = 1;
 
   @AutoLogOutput private boolean isManual = true;
-
   @AutoLogOutput private double manualSpeed = 0;
+
+  @AutoLogOutput private double targetSpeed = 0;
+  @AutoLogOutput private double speed = 0;
 
   private ShooterIO shooterIO;
   private ShooterIOInputsAutoLogged inputs;
@@ -59,16 +63,28 @@ public class Shooter extends SubsystemBase {
 
     // calculate speed that automatically updates with distance
     automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
+    scaledAutomaticSpeed = automaticSpeed * automaticSpeedScalar;
 
-    double speed = getSpeedTarget();
-    shooterIO.setSpeed(speed);
+    targetSpeed = getSpeedTarget();
+    shooterIO.setSpeed(targetSpeed);
+
+    speed = shooterIO.getSpeed();
   }
 
   // SUBSYSTEM METHODS
 
-  /** Sets the robot to use the distance supplier to determine shooting speed */
-  public void setAutomatic() {
+  /**
+   * Sets the robot to use the distance supplier to determine shooting speed, the scalar determines
+   * what scale of automatic speed to use
+   */
+  public void setAutomatic(double scalar) {
     isManual = false;
+    this.automaticSpeedScalar = scalar;
+  }
+
+  /** Sets the robot to use the distance supplier to determine shooting speed, sclar of 1 */
+  public void setAutomatic() {
+    setAutomatic(1);
   }
 
   /**
@@ -85,7 +101,7 @@ public class Shooter extends SubsystemBase {
    */
   public double getSpeedTarget() {
     if (isManual) return manualSpeed;
-    return automaticSpeed;
+    return scaledAutomaticSpeed;
   }
 
   /**
@@ -136,6 +152,10 @@ public class Shooter extends SubsystemBase {
     return new InstantCommand(() -> this.setAutomatic(), this);
   }
 
+  public Command setAutomaticCommandRun() {
+    return Commands.run(() -> this.setAutomatic(), this);
+  }
+
   /**
    * returns a command that revs up to shoot at the distance then ends when it reaches that point
    *
@@ -154,7 +174,13 @@ public class Shooter extends SubsystemBase {
    * @return
    */
   private double getSpeedFromDistance(double distance) {
-    return this.distToSpeedTable.get(distance);
+
+    // dummy value for now
+    return distance;
+
+    // commented otu for now becaues this is flat since we don't have values, I want something we
+    // can debug from
+    // return this.distToSpeedTable.get(distance);
   }
 
   /**
