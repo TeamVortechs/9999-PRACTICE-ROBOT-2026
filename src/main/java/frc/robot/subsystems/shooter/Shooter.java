@@ -214,6 +214,51 @@ public class Shooter extends SubsystemBase {
 }
 
 /*
+figure out a robot lead system to allow shooting on the move
+figure out a leading compensation system to shooting on the move
+
+
+Shooter corridor where shooting is allowed?
+
+limit angular velocity, acceleration, and especially jerk when shooting
+this stability should be checked for over a window
+
+
+Feed allowed if all are true:
+tag visible (or pose confidence high)
+
+
+heading error < θThresh
+
+
+RPM error < rpmThresh
+
+
+abs(omega) < omegaThresh
+
+
+accelMag < aThresh (or stable window)
+
+if (rpmError < tolerance && rpmDerivative > -maxDropRate) {
+    feed();
+}
+
+maybe filter distance
+And don’t run the feeder until feedAllowed has been continuously true for ~100–200ms.
+
+
+
+only have the shooter strand winding up when close scoring location and battery voltage is high enough
+
+add this code to detect when we are moving closer/farther away from note
+rangeRate = dot(v, r̂)
+rpmTarget += kRangeRate * rangeRate
+
+slip detection
+
+ */
+
+/*
  * two modes: supply a distance and have it wind up to that or
  * supply hand values and have it wind up to that
  *

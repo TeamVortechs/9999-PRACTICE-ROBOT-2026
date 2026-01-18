@@ -2,14 +2,19 @@ package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Constants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.drive.Drive;
+
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 
 public class ShooterRotationManager {
   private Supplier<Pose2d> targetPose;
-  private Supplier<Pose2d> robotPose;
+  private Drive drive;
 
   @AutoLogOutput private double distance = 0;
   @AutoLogOutput private double currentRadians;
@@ -17,11 +22,11 @@ public class ShooterRotationManager {
   @AutoLogOutput private boolean onTarget = false;
   /**
    * @param targetPose the pose of the area we want to shoot too
-   * @param robotPose the pose of the robot
+   * @param drive the pose of the robot
    */
-  public ShooterRotationManager(Supplier<Pose2d> targetPose, Supplier<Pose2d> robotPose) {
+  public ShooterRotationManager(Supplier<Pose2d> targetPose, Drive drive) {
     this.targetPose = targetPose;
-    this.robotPose = robotPose;
+    this.drive = drive;
   }
 
   /**
@@ -30,7 +35,7 @@ public class ShooterRotationManager {
    * @return the distance in meters
    */
   public double getDistance() {
-    distance = targetPose.get().getTranslation().getDistance(robotPose.get().getTranslation());
+    distance = targetPose.get().getTranslation().getDistance(getPoseLeaded().getTranslation());
 
     return distance;
   }
@@ -42,7 +47,7 @@ public class ShooterRotationManager {
    */
   public Rotation2d getHeading() {
     // makes it so the robot will rotate towards where it is moving when driving to the pose
-    Translation2d delta = targetPose.get().getTranslation().minus(robotPose.get().getTranslation());
+    Translation2d delta = targetPose.get().getTranslation().minus(getPoseLeaded().getTranslation());
 
     Rotation2d heading = new Rotation2d(delta.getX(), delta.getY());
 
@@ -58,7 +63,7 @@ public class ShooterRotationManager {
    */
   public Rotation2d getRobotRelativeRotation() {
     Rotation2d heading = getHeading();
-    Rotation2d robotRotation = robotPose.get().getRotation();
+    Rotation2d robotRotation = getPoseLeaded().getRotation();
 
     return heading.minus(robotRotation);
   }
@@ -93,7 +98,7 @@ public class ShooterRotationManager {
   public boolean isOriented() {
 
     targetRadians = getHeading().getRadians();
-    currentRadians = robotPose.get().getRotation().getRadians();
+    currentRadians = getPoseLeaded().getRotation().getRadians();
 
     onTarget =
         Math.abs(targetRadians - currentRadians) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
@@ -102,11 +107,21 @@ public class ShooterRotationManager {
   }
 
   /**
-   * setter for target pose
-   *
-   * @param newTargetPose the new target pose
+   * gets the predicted pose after a k amount of seconds. This was we can adjust for robot lag and shooting lag
+   * @return
    */
-  public void setTargetPose(Supplier<Pose2d> newTargetPose) {
-    targetPose = newTargetPose;
+  public Pose2d getPoseLeaded() {
+    Pose2d firstPose = drive.getPose();
+    ChassisSpeeds chassisSpeeds = drive.getChassisSpeeds();
+
+    //this scaling factor is a constnat we'll just need to test for. We can change it depending on if the shot is compensation to much or not enough. We can also make it zero to remove it
+    ChassisSpeeds chassisSpeedsScaled = chassisSpeeds.times(ShooterConstants.LEAD_TIME_POSE_SEC);
+
+    Transform2d speedsScaledTrans = new Transform2d(chassisSpeedsScaled.vxMetersPerSecond, chassisSpeedsScaled.vyMetersPerSecond, new Rotation2d());
+    Pose2d updatedPose = firstPose.plus(speedsScaledTrans);
+    
+    return updatedPose;
   }
+
+
 }
