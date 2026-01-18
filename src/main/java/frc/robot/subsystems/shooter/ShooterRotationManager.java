@@ -35,7 +35,7 @@ public class ShooterRotationManager {
    * @return the distance in meters
    */
   public double getDistance() {
-    distance = targetPose.get().getTranslation().getDistance(getPoseLeaded().getTranslation());
+    distance = getTargetPoseLeaded().getTranslation().getDistance(getCurPoseLeaded().getTranslation());
 
     return distance;
   }
@@ -47,7 +47,7 @@ public class ShooterRotationManager {
    */
   public Rotation2d getHeading() {
     // makes it so the robot will rotate towards where it is moving when driving to the pose
-    Translation2d delta = targetPose.get().getTranslation().minus(getPoseLeaded().getTranslation());
+    Translation2d delta = getTargetPoseLeaded().getTranslation().minus(getCurPoseLeaded().getTranslation());
 
     Rotation2d heading = new Rotation2d(delta.getX(), delta.getY());
 
@@ -63,7 +63,7 @@ public class ShooterRotationManager {
    */
   public Rotation2d getRobotRelativeRotation() {
     Rotation2d heading = getHeading();
-    Rotation2d robotRotation = getPoseLeaded().getRotation();
+    Rotation2d robotRotation = getCurPoseLeaded().getRotation();
 
     return heading.minus(robotRotation);
   }
@@ -98,7 +98,7 @@ public class ShooterRotationManager {
   public boolean isOriented() {
 
     targetRadians = getHeading().getRadians();
-    currentRadians = getPoseLeaded().getRotation().getRadians();
+    currentRadians = getCurPoseLeaded().getRotation().getRadians();
 
     onTarget =
         Math.abs(targetRadians - currentRadians) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
@@ -110,18 +110,34 @@ public class ShooterRotationManager {
    * gets the predicted pose after a k amount of seconds. This was we can adjust for robot lag and shooting lag
    * @return
    */
-  public Pose2d getPoseLeaded() {
+  public Pose2d getCurPoseLeaded() {
     Pose2d firstPose = drive.getPose();
     ChassisSpeeds chassisSpeeds = drive.getChassisSpeeds();
 
     //this scaling factor is a constnat we'll just need to test for. We can change it depending on if the shot is compensation to much or not enough. We can also make it zero to remove it
-    ChassisSpeeds chassisSpeedsScaled = chassisSpeeds.times(ShooterConstants.LEAD_TIME_POSE_SEC);
+    ChassisSpeeds chassisSpeedsScaled = chassisSpeeds.times(ShooterConstants.KRELEASE_POSE_PREDICTION_SEC);
 
     Transform2d speedsScaledTrans = new Transform2d(chassisSpeedsScaled.vxMetersPerSecond, chassisSpeedsScaled.vyMetersPerSecond, new Rotation2d());
     Pose2d updatedPose = firstPose.plus(speedsScaledTrans);
     
     return updatedPose;
   }
+
+  public Pose2d getTargetPoseLeaded() {
+    Pose2d firstPose = targetPose.get();
+      ChassisSpeeds chassisSpeeds = drive.getChassisSpeeds();
+    
+    //this scaling factor is a constnat we'll just need to test for. We can change it depending on if the shot is compensation to much or not enough. We can also make it zero to remove it
+    ChassisSpeeds chassisSpeedsScaled = chassisSpeeds.times(ShooterConstants.KFLIGHT_COMPENSATION_SEC);
+
+    Transform2d speedsScaledTrans = new Transform2d(chassisSpeedsScaled.vxMetersPerSecond, chassisSpeedsScaled.vyMetersPerSecond, new Rotation2d());
+    Pose2d updatedPose = firstPose.plus(speedsScaledTrans);
+
+    return updatedPose;
+  }
+
+
+
 
 
 }
