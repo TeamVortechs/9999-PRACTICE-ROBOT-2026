@@ -8,8 +8,8 @@ import frc.robot.Constants;
 public class ShooterSparkIO implements ShooterIO {
   final SparkMax m_motor = new SparkMax(Constants.ShooterConstants.ID, MotorType.kBrushed);
   private RelativeEncoder m_encoder = m_motor.getEncoder();
-  private final double targetSpeed = 0;
-  private final boolean isOnTarget = false;
+  private double targetSpeed = 0;
+  private boolean isOnTarget = false;
 
   public void updateInputs(ShooterIOInputsAutoLogged inputs) {
     inputs.amps = m_motor.getOutputCurrent();
@@ -24,10 +24,12 @@ public class ShooterSparkIO implements ShooterIO {
    * sets speed -1 to 1
    */
   public void setSpeed(double speed) {
+    targetSpeed = speed;
     m_motor.set(speed);
   }
 
   public void stop() {
+    targetSpeed = 0;
     m_motor.set(0);
   }
 

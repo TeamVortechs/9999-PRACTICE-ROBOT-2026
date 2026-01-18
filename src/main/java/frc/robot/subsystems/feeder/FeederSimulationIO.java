@@ -1,15 +1,8 @@
 package frc.robot.subsystems.feeder;
 
-// import edu.wpi.first.math.controller.ElevatorFeedforward;
-
-// things i think i should import from FeederRotationManager.java
-// imported from ArmSimulationIO.java
-// import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-
-// get constnts
 
 public class FeederSimulationIO implements FeederIO {
   // the motor that spins the things to shoot balls?
@@ -56,6 +49,7 @@ public class FeederSimulationIO implements FeederIO {
 
   // might as well include ts W tech
   public void stop() {
+    targetSpeed = 0;
     setVoltage(0);
   }
 

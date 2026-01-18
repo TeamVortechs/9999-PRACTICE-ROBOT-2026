@@ -5,8 +5,8 @@ import com.revrobotics.spark.SparkMax;
 
 public class FeederSparkIO implements FeederIO {
   final SparkMax m_motor;
-  private final double targetSpeed = 0;
-  private final boolean isOnTarget = false;
+  private double targetSpeed = 0;
+  private boolean isOnTarget = false;
 
   public FeederSparkIO(int id) {
     m_motor = new SparkMax(id, MotorType.kBrushed);
@@ -17,6 +17,8 @@ public class FeederSparkIO implements FeederIO {
     inputs.voltage = m_motor.getBusVoltage();
     inputs.speed = 0;
 
+    isOnTarget = isOnTarget();
+
     inputs.targetSpeed = targetSpeed;
     inputs.isOnTarget = isOnTarget;
   }
@@ -25,10 +27,12 @@ public class FeederSparkIO implements FeederIO {
    * sets speed -1 to 1
    */
   public void setSpeed(double speed) {
+    targetSpeed = speed;
     m_motor.set(speed);
   }
 
   public void stop() {
+    targetSpeed = 0;
     m_motor.set(0);
   }
 
@@ -39,9 +43,9 @@ public class FeederSparkIO implements FeederIO {
     return 0;
   }
 
+  @Override
   public boolean isOnTarget() {
-    // return Math.abs((getSpeed() - targetSpeed)) <= Constants.FeederConstants.TOLERANCE;
-    return false;
+    return Math.abs(getSpeed() - targetSpeed) < .05;
   }
 
   public void setVoltage(double voltage) {
