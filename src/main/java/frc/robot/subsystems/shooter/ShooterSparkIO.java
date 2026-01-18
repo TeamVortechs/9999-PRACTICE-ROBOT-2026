@@ -1,21 +1,20 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.shooter;
 
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import frc.robot.Constants;
 
-public class IntakeSparkIO implements IntakeIO {
-  final SparkMax m_motor;
+public class ShooterSparkIO implements ShooterIO {
+  final SparkMax m_motor = new SparkMax(Constants.ShooterConstants.ID, MotorType.kBrushed);
+  private RelativeEncoder m_encoder = m_motor.getEncoder();
   private final double targetSpeed = 0;
   private final boolean isOnTarget = false;
 
-  public IntakeSparkIO(int id) {
-    m_motor = new SparkMax(id, MotorType.kBrushed);
-  }
-
-  public void updateInputs(IntakeIOInputsAutoLogged inputs) {
+  public void updateInputs(ShooterIOInputsAutoLogged inputs) {
     inputs.amps = m_motor.getOutputCurrent();
     inputs.voltage = m_motor.getBusVoltage();
-    inputs.speed = 0;
+    inputs.speed = m_encoder.getVelocity(); // in RPM
 
     inputs.targetSpeed = targetSpeed;
     inputs.isOnTarget = isOnTarget;
@@ -36,12 +35,11 @@ public class IntakeSparkIO implements IntakeIO {
    * returns speed in RPM
    */
   public double getSpeed() {
-    return 0;
+    return m_encoder.getVelocity();
   }
 
   public boolean isOnTarget() {
-    // return Math.abs((getSpeed() - targetSpeed)) <= Constants.IntakeConstants.TOLERANCE;
-    return false;
+    return Math.abs((getSpeed() - targetSpeed)) <= Constants.ShooterConstants.TOLERANCE;
   }
 
   public void setVoltage(double voltage) {

@@ -1,10 +1,10 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.feeder;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface IntakeIO {
+public interface FeederIO {
   @AutoLog
-  public static class IntakeIOInputs {
+  public static class FeederIOInputs {
     double speed;
     double targetSpeed;
     double amps;
@@ -13,7 +13,7 @@ public interface IntakeIO {
   }
 
   /** updates the inputs for advantage kit logging purposes */
-  public default void updateInputs(IntakeIOInputsAutoLogged inputs) {}
+  public default void updateInputs(FeederIOInputsAutoLogged inputs) {}
 
   public default void setSpeed(double speed) {}
 

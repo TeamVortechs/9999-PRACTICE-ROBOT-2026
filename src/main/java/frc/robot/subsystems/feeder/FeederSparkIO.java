@@ -1,0 +1,50 @@
+package frc.robot.subsystems.feeder;
+
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+
+public class FeederSparkIO implements FeederIO {
+  final SparkMax m_motor;
+  private final double targetSpeed = 0;
+  private final boolean isOnTarget = false;
+
+  public FeederSparkIO(int id) {
+    m_motor = new SparkMax(id, MotorType.kBrushed);
+  }
+
+  public void updateInputs(FeederIOInputsAutoLogged inputs) {
+    inputs.amps = m_motor.getOutputCurrent();
+    inputs.voltage = m_motor.getBusVoltage();
+    inputs.speed = 0;
+
+    inputs.targetSpeed = targetSpeed;
+    inputs.isOnTarget = isOnTarget;
+  }
+
+  /*
+   * sets speed -1 to 1
+   */
+  public void setSpeed(double speed) {
+    m_motor.set(speed);
+  }
+
+  public void stop() {
+    m_motor.set(0);
+  }
+
+  /*
+   * returns speed in RPM
+   */
+  public double getSpeed() {
+    return 0;
+  }
+
+  public boolean isOnTarget() {
+    // return Math.abs((getSpeed() - targetSpeed)) <= Constants.FeederConstants.TOLERANCE;
+    return false;
+  }
+
+  public void setVoltage(double voltage) {
+    m_motor.setVoltage(voltage);
+  }
+}

@@ -1,49 +1,50 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems.feeder;
 
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.FeederConstants;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class Intake extends SubsystemBase {
+public class Feeder extends SubsystemBase {
 
   // this shouldn't be here but it is for now because we're probably gonna move this
-  public static final double TOLERANCE = IntakeConstants.TOLERANCE;
+  public static final double TOLERANCE = FeederConstants.TOLERANCE;
 
   // just here for the logging
   @AutoLogOutput private double speed = 0;
 
-  private IntakeIO intakeIO;
-  private IntakeIOInputsAutoLogged inputs;
+  private FeederIO feederIO;
+  private FeederIOInputsAutoLogged inputs;
 
   /**
-   * @param intakeIO the hardware interface
+   * @param feederIO the hardware interface
    */
-  public Intake(IntakeIO intakeIO) {
-    this.intakeIO = intakeIO;
-    this.inputs = new IntakeIOInputsAutoLogged();
+  public Feeder(FeederIO feederIO) {
+    this.feederIO = feederIO;
+    this.inputs = new FeederIOInputsAutoLogged();
   }
 
   @Override
   public void periodic() {
-    intakeIO.updateInputs(inputs);
-    Logger.processInputs("intake", inputs);
+    feederIO.updateInputs(inputs);
+    Logger.processInputs("feeder", inputs);
 
     // calculate speed that automatically updates with distance
     // automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
 
     double speed = getSpeedTarget();
-    intakeIO.setSpeed(speed);
+    feederIO.setSpeed(speed);
   }
 
   // SUBSYSTEM METHODS
@@ -67,7 +68,7 @@ public class Intake extends SubsystemBase {
    * @return wether the speed is the target speed
    */
   public boolean isOnTarget() {
-    return intakeIO.isOnTarget();
+    return feederIO.isOnTarget();
   }
 
   // COMMANDS
@@ -92,6 +93,16 @@ public class Intake extends SubsystemBase {
         .andThen(new WaitUntilCommand(() -> this.isOnTarget()));
   }
 
+  /**
+   * sets the manual speed of the flywheel, runs multiple times
+   *
+   * @param speed the speed of the flywheel
+   * @return the finished command
+   */
+  public Command setSpeedRunCommand(double speed) {
+    return Commands.run(() -> this.setSpeed(speed), this);
+  }
+
   // the constants here should probably be more and move but that's later when this is transferred
   // to the right project
   // add this to the robot class or this won't work: SignalLogger.setPath("/media/sda1/");
@@ -105,16 +116,16 @@ public class Intake extends SubsystemBase {
     SysIdRoutine m_SysIdRoutine =
         new SysIdRoutine(
             new SysIdRoutine.Config(
-                Volts.of(IntakeConstants.RAMP_RATE_VOLTS_SYSID)
+                Volts.of(FeederConstants.RAMP_RATE_VOLTS_SYSID)
                     .per(Seconds), // Ramp Rate in Volts / Seconds
-                Volts.of(IntakeConstants.DYNAMIC_STEP_VOLTS_SYSID), // Dynamic Step Voltage
+                Volts.of(FeederConstants.DYNAMIC_STEP_VOLTS_SYSID), // Dynamic Step Voltage
                 null, // Use default timeout (10 s)
                 (state) ->
                     SignalLogger.writeString(
                         "state", state.toString()) // Log state with Phoenix SignalLogger class
                 ),
             new SysIdRoutine.Mechanism(
-                (volts) -> intakeIO.setVoltage(volts.in(Volts)), null, this));
+                (volts) -> feederIO.setVoltage(volts.in(Volts)), null, this));
     return m_SysIdRoutine;
   }
 

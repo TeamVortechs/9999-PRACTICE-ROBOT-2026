@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -24,10 +25,17 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.intake.IntakeIO;
-import frc.robot.subsystems.intake.IntakeSimulationIO;
-import frc.robot.subsystems.intake.IntakeSparkIO;
+import frc.robot.subsystems.feeder.Feeder;
+import frc.robot.subsystems.feeder.FeederIO;
+import frc.robot.subsystems.feeder.FeederSimulationIO;
+import frc.robot.subsystems.feeder.FeederSparkIO;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.shooter.ShooterRotationManager;
+import frc.robot.subsystems.shooter.ShooterSimulationIO;
+import frc.robot.subsystems.shooter.ShooterSparkIO;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -39,8 +47,11 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Intake intake;
+  private final Feeder feeder;
+  private final Shooter shooter;
+  private final ShooterRotationManager shooterRotationManager;
 
+  private final Supplier<Pose2d> targetPose = () -> new Pose2d(4.76, 4, new Rotation2d());
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
 
@@ -54,7 +65,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
-        intake = new Intake(new IntakeSparkIO(0));
+        feeder = new Feeder(new FeederSparkIO(0));
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -62,6 +73,10 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        shooterRotationManager =
+            new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooter = new Shooter(new ShooterSparkIO(), () -> shooterRotationManager.getDistance());
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -84,7 +99,7 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
-        intake = new Intake(new IntakeSimulationIO());
+        feeder = new Feeder(new FeederSimulationIO());
         drive =
             new Drive(
                 new GyroIO() {},
@@ -92,10 +107,14 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
+        shooterRotationManager =
+            new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooter =
+            new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         break;
 
       default:
-        intake = new Intake(new IntakeIO() {});
+        feeder = new Feeder(new FeederIO() {});
         // Replayed robot, disable IO implementations
         drive =
             new Drive(
@@ -104,6 +123,10 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        shooterRotationManager =
+            new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooter =
+            new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         break;
     }
 
@@ -145,6 +168,32 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
+    Command orientDrive =
+        DriveCommands.joystickDriveAtAngle(
+            drive,
+            () -> -controller.getLeftY() * 0.5,
+            () -> -controller.getLeftX() * 0.5,
+            () -> shooterRotationManager.getHeading());
+
+    // this is for mode 2, where you can shoot at any distance
+    // requirements before shooting
+    BooleanSupplier isAlignned = () -> shooterRotationManager.isOriented();
+    BooleanSupplier atSpeed = () -> shooter.isOnTarget();
+
+    Command shootCommand =
+        shooter
+            .setAutomaticCommandConsistentEnd()
+            .andThen(new WaitUntilCommand(() -> shooterRotationManager.isOriented()))
+            .andThen(feeder.setSpeedRunCommand(0.25));
+
+    Command shootSequence =
+        Commands.sequence(
+            Commands.parallel(
+                orientDrive, // face towards goal
+                shootCommand));
+
+    controller.leftTrigger().whileTrue(shootSequence);
+
     // Lock to 0° when A button is held
     controller
         .a()
@@ -169,12 +218,16 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    controller
-        .y().whileTrue(intake.setSpeedCommand(0.25));
+    // controller.y().onFalse(feeder.setSpeedCommand(0));
 
-    controller.y().onFalse(intake.setSpeedCommand(0));
-          
-    }
+    shooter.setDefaultCommand(
+        shooter.setManualSpeedRunCommand(
+            0.25)); // make shooter go to this speed when it's not being used
+
+    feeder.setDefaultCommand(feeder.setSpeedRunCommand(0));
+
+    controller.y().whileTrue(shooter.setManualSpeedRunCommand(0.5));
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
