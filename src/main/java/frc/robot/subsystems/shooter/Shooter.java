@@ -36,7 +36,7 @@ public class Shooter extends SubsystemBase {
   private ShooterIOInputsAutoLogged inputs;
 
   // TO DO: add values to table
-  private final InterpolatingDoubleTreeMap distToSpeedTable = new InterpolatingDoubleTreeMap();
+  private final InterpolatingDoubleTreeMap distToSpeedTable;
 
   /**
    * @param shooterIO the hardware interface
@@ -46,6 +46,10 @@ public class Shooter extends SubsystemBase {
     this.distanceSupplier = distanceSupplierMeters;
     this.shooterIO = shooterIO;
     this.inputs = new ShooterIOInputsAutoLogged();
+
+    this.distToSpeedTable = new InterpolatingDoubleTreeMap();
+    // TO DO: populate distToSpeedTable with real valeus
+    this.speedToTableInit(10.0, 10.0); // dummy val
   }
 
   @Override
@@ -150,7 +154,18 @@ public class Shooter extends SubsystemBase {
    * @return
    */
   private double getSpeedFromDistance(double distance) {
-    return distToSpeedTable.get(distance);
+    return this.distToSpeedTable.get(distance);
+  }
+
+  /**
+   * inserts values into the distToSpeedTable
+   *
+   * @param distance dist from goal to shoot into
+   * @param speed speed for shooter to be at
+   * @return
+   */
+  private void speedToTableInit(double distance, double speed) {
+    this.distToSpeedTable.put(distance, speed);
   }
 
   // the constants here should probably be more and move but that's later when this is transferred
