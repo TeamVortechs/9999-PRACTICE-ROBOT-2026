@@ -54,7 +54,11 @@ public final class Constants {
     // time
     public static final double KFLIGHT_COMPENSATION_SEC = 0.2;
 
-    public static final double K_JOYSTICK_WHEN_SHOOTING = 0.7;
+    public static final double K_JOYSTICK_WHEN_SHOOTING = 0.5;
+
+
+    //the time that the feeder waits before shooting once it is valis
+    public static final double VALIDITY_DEBOUNCE_TIME_SEC = 0.2;
   }
 
   // copied directly from ShooterConstants
@@ -67,5 +71,7 @@ public final class Constants {
     public static final double TOLERANCE = 0.1;
 
     public static final int ID = 0;
+
+    public static final double FEED_POWER = 0.1;
   }
 }

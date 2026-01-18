@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.FeedWhenValidCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -174,15 +175,15 @@ public class RobotContainer {
 
     // accelerate shooter to target speed(determined by distance), orient shooter, then start the
     // feeder to shoot
-    Command shootCommand =
-        shooter
-            .setAutomaticCommandConsistentEnd()
-            .andThen(new WaitUntilCommand(() -> shooterRotationManager.isOriented()))
-            .andThen(feeder.setSpeedRunCommand(0.25));
+    // Command shootCommand =
+    //     shooter
+    //         .setAutomaticCommandConsistentEnd()
+    //         .andThen(new WaitUntilCommand(() -> shooterRotationManager.isOriented()))
+    //         .andThen(feeder.setSpeedRunCommand(0.25));
 
     // always orient drive and shoot at the same time... might be a little sloppy but a majority of
     // balls will make it
-    Command shootSequence = Commands.parallel(orientDrive, shootCommand);
+    Command shootSequence = Commands.parallel(orientDrive, shooter.setAutomaticCommand(), new FeedWhenValidCommand(feeder, controller, shooter, shooterRotationManager));
 
     controller.leftTrigger().whileTrue(shootSequence);
 
