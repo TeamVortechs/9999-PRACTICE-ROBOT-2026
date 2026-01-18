@@ -72,7 +72,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
-        shooterRotationManager = new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooterRotationManager = new ShooterRotationManager(targetPose, drive);
         shooter = new Shooter(new ShooterSparkIO(), () -> shooterRotationManager.getDistance());
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
@@ -104,7 +104,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        shooterRotationManager = new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooterRotationManager = new ShooterRotationManager(targetPose, drive);
         shooter =
             new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         break;
@@ -119,7 +119,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        shooterRotationManager = new ShooterRotationManager(targetPose, () -> drive.getPose());
+        shooterRotationManager = new ShooterRotationManager(targetPose, drive);
         shooter =
             new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         break;
@@ -229,4 +229,9 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
+
+  public ShooterRotationManager getShooterRotationManager() {
+    return shooterRotationManager;
+  }
 }
+

@@ -20,6 +20,9 @@ public class ShooterRotationManager {
   @AutoLogOutput private double currentRadians;
   @AutoLogOutput private double targetRadians;
   @AutoLogOutput private boolean onTarget = false;
+  @AutoLogOutput private Pose2d unFilteredTargetPose = new Pose2d();
+  @AutoLogOutput private Pose2d unFilteredCurrentPose = new Pose2d();
+  
   /**
    * @param targetPose the pose of the area we want to shoot too
    * @param drive the pose of the robot
@@ -27,6 +30,16 @@ public class ShooterRotationManager {
   public ShooterRotationManager(Supplier<Pose2d> targetPose, Drive drive) {
     this.targetPose = targetPose;
     this.drive = drive;
+  }
+
+  //logs all of the values from this. Should be called repeatedly
+  public void log() {
+    //all of these methods automatically log values
+    getDistance();
+    getHeading();
+    isOriented();
+
+
   }
 
   /**
@@ -110,8 +123,13 @@ public class ShooterRotationManager {
    * gets the predicted pose after a k amount of seconds. This was we can adjust for robot lag and shooting lag
    * @return
    */
+  @AutoLogOutput
   public Pose2d getCurPoseLeaded() {
     Pose2d firstPose = drive.getPose();
+
+    //logs the unfiltered pose so we can see the difference
+    unFilteredCurrentPose = firstPose;
+
     ChassisSpeeds chassisSpeeds = drive.getChassisSpeeds();
 
     //this scaling factor is a constnat we'll just need to test for. We can change it depending on if the shot is compensation to much or not enough. We can also make it zero to remove it
@@ -123,9 +141,14 @@ public class ShooterRotationManager {
     return updatedPose;
   }
 
+  @AutoLogOutput
   public Pose2d getTargetPoseLeaded() {
     Pose2d firstPose = targetPose.get();
-      ChassisSpeeds chassisSpeeds = drive.getChassisSpeeds();
+    
+    //logs the unfiltered pose so we can see the difference 
+    unFilteredTargetPose = firstPose;
+
+    ChassisSpeeds chassisSpeeds = drive.getChassisSpeeds();
     
     //this scaling factor is a constnat we'll just need to test for. We can change it depending on if the shot is compensation to much or not enough. We can also make it zero to remove it
     ChassisSpeeds chassisSpeedsScaled = chassisSpeeds.times(ShooterConstants.KFLIGHT_COMPENSATION_SEC);
