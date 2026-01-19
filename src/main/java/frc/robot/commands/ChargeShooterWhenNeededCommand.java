@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.shooter.Shooter;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
 
 /*
@@ -44,13 +43,14 @@ public class ChargeShooterWhenNeededCommand extends Command {
 
     settingAutomatic = x < ShooterConstants.X_POSE_TO_CHARGE;
 
-    //simple zone check to see if it should charge yet
+    // simple zone check to see if it should charge yet
 
-    //if it's within zone it should be charged reasonably close because we're most likely gonna shoot soon
-    if(settingAutomatic) {
+    // if it's within zone it should be charged reasonably close because we're most likely gonna
+    // shoot soon
+    if (settingAutomatic) {
       shooter.setAutomatic(ShooterConstants.PERCENTAGE_OF_DISTANCE_WHEN_CHARGING);
     } else {
-      //if it's not in zone it shoudl be pretty small to conserve poewr
+      // if it's not in zone it shoudl be pretty small to conserve poewr
       shooter.setManualSpeed(ShooterConstants.DEFAULT_SPEED);
     }
 

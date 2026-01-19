@@ -120,7 +120,7 @@ public class ShooterRotationManager {
 
     radiansDifference = error.getRadians();
 
-    //it's possible we could make tolerance a function of distance if it is a limiting factor 
+    // it's possible we could make tolerance a function of distance if it is a limiting factor
     onTarget = Math.abs(error.getRadians()) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
 
     return onTarget;

@@ -39,7 +39,9 @@ public final class Constants {
 
     public static final int ID = 1;
 
-    //this is higher rn cus it's in sim
+    // this is higher rn cus it's in sim. We can model this as a linear function based on distance
+    // if we're having trouble adjusting but right now I'm not cus it's a variable that mgiht not be
+    // necessary
     public static final double ORIENTATION_TOLERANCE = .1;
 
     public static final double DEFAULT_SPEED = .25; // speed intake/shooter run at default
@@ -63,7 +65,8 @@ public final class Constants {
     // the time that the feeder waits before shooting once it is valis
     public static final double VALIDITY_DEBOUNCE_TIME_SEC = 0.2;
 
-    //the maximum allowed difference allowed between acceleraomter and encoders before it is considered skid
+    // the maximum allowed difference allowed between acceleraomter and encoders before it is
+    // considered skid
     public static final double SKID_THRESHOLD = 0.5;
   }
 

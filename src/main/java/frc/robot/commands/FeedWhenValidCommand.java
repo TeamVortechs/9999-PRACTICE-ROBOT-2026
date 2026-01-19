@@ -1,18 +1,19 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
-import edu.wpi.first.wpilibj.simulation.BuiltInAccelerometerSim;
 import edu.wpi.first.wpilibj.BuiltInAccelerometer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants;
 import frc.robot.Constants.FeederConstants;
+import frc.robot.Constants.Mode;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.feeder.Feeder;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterRotationManager;
-import org.littletonrobotics.junction.AutoLogOutput;
+import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 /*
@@ -34,7 +35,6 @@ public class FeedWhenValidCommand extends Command {
   /** timer since it was last valid. The code waits a certain time before it is ok to shooot */
   private Timer validityTimer;
 
-
   private Feeder feeder;
 
   // controller to give feedback too
@@ -45,7 +45,8 @@ public class FeedWhenValidCommand extends Command {
   private ShooterRotationManager shooterRotationManager;
   private Drive drive;
 
-  //used for measuring if we are measuring different chassis speeds(skid) which means the shooter is most likely not accurate 
+  // used for measuring if we are measuring different chassis speeds(skid) which means the shooter
+  // is most likely not accurate
   private BuiltInAccelerometer accelerometer;
 
   private double accelerometerX = 0;
@@ -54,14 +55,16 @@ public class FeedWhenValidCommand extends Command {
   private double chassisX = 0;
   private double chassisY = 0;
 
-
-  //here for logging
+  // here for logging
   private boolean isValid = false;
   private boolean isFeedable = false;
-  
+
   private boolean speedWithinTolerance = false;
   private boolean isOriented = false;
   private boolean isNotSkidding = false;
+  private boolean seesAprilTag = false;
+
+  private BooleanSupplier overrideVision;
 
   /**
    * @param feeder only mechanism this command contorls
@@ -69,12 +72,16 @@ public class FeedWhenValidCommand extends Command {
    * @param shooter checks for shooter speed
    * @param shooterRotationManager checks that rotation is on target
    * @param drive checks that there is no skid
+   * @param overrideVision wether or not we override vision and acceleration change detection when
+   *     feeding.
    */
   public FeedWhenValidCommand(
       Feeder feeder,
       CommandXboxController controller,
       Shooter shooter,
-      ShooterRotationManager shooterRotationManager, Drive drive) {
+      ShooterRotationManager shooterRotationManager,
+      Drive drive,
+      BooleanSupplier overrideVision) {
     // addRequirements(null);
 
     this.feeder = feeder;
@@ -86,6 +93,8 @@ public class FeedWhenValidCommand extends Command {
 
     accelerometer = new BuiltInAccelerometer();
     validityTimer = new Timer();
+
+    this.overrideVision = overrideVision;
 
     addRequirements(feeder);
   }
@@ -100,7 +109,7 @@ public class FeedWhenValidCommand extends Command {
   @Override
   public void execute() {
 
-    //this is done this way to allow loging
+    // this is done this way to allow loging
     checkCurValidity();
     checkFeedability(isValid);
 
@@ -135,20 +144,36 @@ public class FeedWhenValidCommand extends Command {
     speedWithinTolerance = shooter.isOnTarget();
     isOriented = shooterRotationManager.isOriented();
 
-    //slip test
+    // slip test
     chassisX = drive.getChassisSpeeds().vxMetersPerSecond;
     chassisY = drive.getChassisSpeeds().vyMetersPerSecond;
 
     accelerometerX = accelerometer.getX();
     accelerometerY = accelerometer.getY();
 
-    isNotSkidding = Math.abs(accelerometerX - chassisX) < ShooterConstants.SKID_THRESHOLD && Math.abs(accelerometerY - chassisY) < ShooterConstants.SKID_THRESHOLD;
- 
+    isNotSkidding =
+        Math.abs(accelerometerX - chassisX) < ShooterConstants.SKID_THRESHOLD
+            && Math.abs(accelerometerY - chassisY) < ShooterConstants.SKID_THRESHOLD;
+
     // we can also check for jerk here
-    //not adding skid/slip test here because this is sim
+    // not adding skid/slip test here because this is sim
 
+    // we don't have vision up yet here
+    seesAprilTag = true;
 
-    isValid = speedWithinTolerance && isOriented;
+    //we don't have an accelerometer in sim
+    if(Constants.currentMode == Mode.SIM) {
+        isNotSkidding = true;
+    }
+
+    // simpler check if we don't care abotu vision for whatever reason
+    if (overrideVision.getAsBoolean()) {
+      isValid = speedWithinTolerance && isOriented;
+
+      // do this if we care abotu vision
+    } else {
+      isValid = speedWithinTolerance && isOriented && isNotSkidding && seesAprilTag;
+    }
   }
 
   /** takes debounce time into consideration to see if we should we feed right away or still wait */
@@ -160,10 +185,10 @@ public class FeedWhenValidCommand extends Command {
       return;
     }
 
-    isFeedable = validityTimer.hasElapsed(ShooterConstants.VALIDITY_DEBOUNCE_TIME_SEC);
+    isFeedable = validityTimer.hasElapsed(ShooterConstants.VALIDITY_DEBOUNCE_TIME_SEC) ||
+    //this way there won't be a wait time if the user needs it shot now
+     overrideVision.getAsBoolean();
   }
-
-
 
   private void log() {
     Logger.recordOutput("FeedWhenValidCommand/timer", validityTimer.get());
@@ -176,6 +201,6 @@ public class FeedWhenValidCommand extends Command {
     Logger.recordOutput("FeedWhenValidCommand/accelerometerY", accelerometerY);
     Logger.recordOutput("FeedWhenValidCommand/chassisX", chassisX);
     Logger.recordOutput("FeedWhenValidCommand/chassisY", chassisY);
-
+    Logger.recordOutput("FeedWhenValidCommand/seesAprilTag", seesAprilTag);
   }
 }

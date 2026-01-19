@@ -184,7 +184,13 @@ public class RobotContainer {
     // always orient drive and shoot at the same time... might be a little sloppy but a majority of
 
     Command feedWhenValid =
-        new FeedWhenValidCommand(feeder, controller, shooter, shooterRotationManager, drive);
+        new FeedWhenValidCommand(
+            feeder,
+            controller,
+            shooter,
+            shooterRotationManager,
+            drive,
+            () -> controller.a().getAsBoolean());
 
     // balls will make it
     Command shootSequence =
@@ -194,7 +200,7 @@ public class RobotContainer {
 
     // Lock to 0° when A button is held
     controller
-        .a()
+        .rightBumper()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
@@ -216,7 +222,10 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    shooter.setDefaultCommand(new ChargeShooterWhenNeededCommand(shooter, () -> drive.getPose())); // make shooter go to this speed when it's not being used
+    shooter.setDefaultCommand(
+        new ChargeShooterWhenNeededCommand(
+            shooter,
+            () -> drive.getPose())); // make shooter go to this speed when it's not being used
 
     feeder.setDefaultCommand(feeder.setSpeedRunCommand(0));
 
@@ -224,7 +233,11 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED));
 
-    controller.leftBumper().whileTrue(shooter.setAutomaticCommandRun());
+    controller
+        .leftBumper()
+        .whileTrue(
+            shooter
+                .setAutomaticCommandRun());
   }
 
   /**
