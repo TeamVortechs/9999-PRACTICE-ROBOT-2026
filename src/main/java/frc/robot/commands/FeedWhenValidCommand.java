@@ -195,7 +195,7 @@ public class FeedWhenValidCommand extends Command {
   private void log() {
     Logger.recordOutput("FeedWhenValidCommand/timer", validityTimer.get());
     Logger.recordOutput("FeedWhenValidCommand/isCurrentlyValid", isValid);
-    Logger.recordOutput("FeedWhenValidCommand/isFeedable", isFeedable);
+    Logger.recordOutput("FeedWhenValidCommand/isFeeding", isFeedable);
     Logger.recordOutput("FeedWhenValidCommand/ShooterSpeedWithinTolerance", speedWithinTolerance);
     Logger.recordOutput("FeedWhenValidCommand/IsOrientedCorrectly", isOriented);
     Logger.recordOutput("FeedWhenValidCommand/isNotSkidding", isNotSkidding);

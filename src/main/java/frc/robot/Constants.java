@@ -48,7 +48,7 @@ public final class Constants {
     // speed intake/shooter boosts to
     public static final double INTAKE_SPEED = .5;
 
-    public static final double X_POSE_TO_CHARGE = 6.5;
+    public static final double X_POSE_TO_CHARGE = 5.5;
     public static final double PERCENTAGE_OF_DISTANCE_WHEN_CHARGING = 0.6;
 
     // the time it takes between feeding and actual robot shoot. This is used to lead the robot

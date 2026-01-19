@@ -200,7 +200,7 @@ public class RobotContainer {
 
     // Lock to 0° when A button is held
     controller
-        .rightBumper()
+        .rightStick()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,

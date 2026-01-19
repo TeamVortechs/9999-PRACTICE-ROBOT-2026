@@ -21,8 +21,10 @@ public class Feeder extends SubsystemBase {
   // this shouldn't be here but it is for now because we're probably gonna move this
   public static final double TOLERANCE = FeederConstants.TOLERANCE;
 
-  // just here for the logging
-  @AutoLogOutput private double speed = 0;
+  // just here for the logging, done like this so we can put it on a dashboard
+  @AutoLogOutput(key = "Feeder/FeederSpeed") private double speed = 0;
+  @AutoLogOutput(key = "Feeder/FeederTargetSpeed") private double targetSpeed = 0;
+  @AutoLogOutput(key = "Feeder/IsOnTarget") private boolean isOnTarget = false;  
 
   private FeederIO feederIO;
   private FeederIOInputsAutoLogged inputs;
@@ -43,8 +45,11 @@ public class Feeder extends SubsystemBase {
     // calculate speed that automatically updates with distance
     // automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
 
-    double speed = getSpeedTarget();
-    feederIO.setSpeed(speed);
+    targetSpeed = getSpeedTarget();
+    speed = feederIO.getSpeed();
+    isOnTarget = isOnTarget();
+
+    feederIO.setSpeed(targetSpeed);
   }
 
   // SUBSYSTEM METHODS

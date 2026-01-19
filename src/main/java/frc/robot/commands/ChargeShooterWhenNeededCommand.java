@@ -68,6 +68,6 @@ public class ChargeShooterWhenNeededCommand extends Command {
   }
 
   private void log() {
-    Logger.recordOutput("ChargeShooterWhenNeededCommand/settingAutomatic", settingAutomatic);
+    Logger.recordOutput("ChargeShooterWhenNeededCommand/automaticallyCharging", settingAutomatic);
   }
 }
