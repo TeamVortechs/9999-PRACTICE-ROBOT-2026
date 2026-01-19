@@ -20,6 +20,7 @@ public class ShooterRotationManager {
   @AutoLogOutput private double distance = 0;
   @AutoLogOutput private double currentRadians;
   @AutoLogOutput private double targetRadians;
+  @AutoLogOutput private double radiansDifference;
   @AutoLogOutput private boolean onTarget = false;
   @AutoLogOutput private Pose2d unFilteredTargetPose = new Pose2d();
   @AutoLogOutput private Pose2d unFilteredCurrentPose = new Pose2d();
@@ -116,6 +117,8 @@ public class ShooterRotationManager {
 
     // im not sure if this should be current or predicted drive, I'll ask
     Rotation2d error = getHeading().minus(drive.getRotation());
+
+    radiansDifference = error.getRadians();
 
     onTarget = Math.abs(error.getRadians()) < Constants.ShooterConstants.ORIENTATION_TOLERANCE;
 
