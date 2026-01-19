@@ -1,11 +1,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.simulation.BuiltInAccelerometerSim;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.feeder.Feeder;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterRotationManager;
@@ -40,6 +43,17 @@ public class FeedWhenValidCommand extends Command {
   // these are just used for validity requirements
   private Shooter shooter;
   private ShooterRotationManager shooterRotationManager;
+  private Drive drive;
+
+  //used for measuring if we are measuring different chassis speeds(skid) which means the shooter is most likely not accurate 
+  private BuiltInAccelerometer accelerometer;
+
+  private double accelerometerX = 0;
+  private double accelerometerY = 0;
+
+  private double chassisX = 0;
+  private double chassisY = 0;
+
 
   //here for logging
   private boolean isValid = false;
@@ -47,16 +61,20 @@ public class FeedWhenValidCommand extends Command {
   
   private boolean speedWithinTolerance = false;
   private boolean isOriented = false;
+  private boolean isNotSkidding = false;
 
   /**
    * @param feeder only mechanism this command contorls
    * @param controller gives feedback
+   * @param shooter checks for shooter speed
+   * @param shooterRotationManager checks that rotation is on target
+   * @param drive checks that there is no skid
    */
   public FeedWhenValidCommand(
       Feeder feeder,
       CommandXboxController controller,
       Shooter shooter,
-      ShooterRotationManager shooterRotationManager) {
+      ShooterRotationManager shooterRotationManager, Drive drive) {
     // addRequirements(null);
 
     this.feeder = feeder;
@@ -64,7 +82,9 @@ public class FeedWhenValidCommand extends Command {
 
     this.shooter = shooter;
     this.shooterRotationManager = shooterRotationManager;
+    this.drive = drive;
 
+    accelerometer = new BuiltInAccelerometer();
     validityTimer = new Timer();
 
     addRequirements(feeder);
@@ -115,13 +135,23 @@ public class FeedWhenValidCommand extends Command {
     speedWithinTolerance = shooter.isOnTarget();
     isOriented = shooterRotationManager.isOriented();
 
-    // we can also do a slip test here by comparing acceleraomter and chassis speeds
+    //slip test
+    chassisX = drive.getChassisSpeeds().vxMetersPerSecond;
+    chassisY = drive.getChassisSpeeds().vyMetersPerSecond;
+
+    accelerometerX = accelerometer.getX();
+    accelerometerY = accelerometer.getY();
+
+    isNotSkidding = Math.abs(accelerometerX - chassisX) < ShooterConstants.SKID_THRESHOLD && Math.abs(accelerometerY - chassisY) < ShooterConstants.SKID_THRESHOLD;
+
+
 
     // we can also check for jerk here
+    //not adding skid/slip test here because this is sim
+
 
     isValid = speedWithinTolerance && isOriented;
   }
-
 
   /** takes debounce time into consideration to see if we should we feed right away or still wait */
   private void checkFeedability(boolean isValid) {
@@ -135,11 +165,19 @@ public class FeedWhenValidCommand extends Command {
     isFeedable = validityTimer.hasElapsed(ShooterConstants.VALIDITY_DEBOUNCE_TIME_SEC);
   }
 
+
+
   private void log() {
     Logger.recordOutput("FeedWhenValidCommand/timer", validityTimer.get());
     Logger.recordOutput("FeedWhenValidCommand/isCurrentlyValid", isValid);
     Logger.recordOutput("FeedWhenValidCommand/isFeedable", isFeedable);
     Logger.recordOutput("FeedWhenValidCommand/ShooterSpeedWithinTolerance", speedWithinTolerance);
     Logger.recordOutput("FeedWhenValidCommand/IsOrientedCorrectly", isOriented);
+    Logger.recordOutput("FeedWhenValidCommand/isNotSkidding", isNotSkidding);
+    Logger.recordOutput("FeedWhenValidCommand/accelerometerX", accelerometerX);
+    Logger.recordOutput("FeedWhenValidCommand/accelerometerY", accelerometerY);
+    Logger.recordOutput("FeedWhenValidCommand/chassisX", chassisX);
+    Logger.recordOutput("FeedWhenValidCommand/chassisY", chassisY);
+
   }
 }

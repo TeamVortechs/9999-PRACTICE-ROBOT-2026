@@ -184,7 +184,7 @@ public class RobotContainer {
     // always orient drive and shoot at the same time... might be a little sloppy but a majority of
 
     Command feedWhenValid =
-        new FeedWhenValidCommand(feeder, controller, shooter, shooterRotationManager);
+        new FeedWhenValidCommand(feeder, controller, shooter, shooterRotationManager, drive);
 
     // balls will make it
     Command shootSequence =

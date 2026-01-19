@@ -62,6 +62,9 @@ public final class Constants {
 
     // the time that the feeder waits before shooting once it is valis
     public static final double VALIDITY_DEBOUNCE_TIME_SEC = 0.2;
+
+    //the maximum allowed difference allowed between acceleraomter and encoders before it is considered skid
+    public static final double SKID_THRESHOLD = 0.5;
   }
 
   // copied directly from ShooterConstants
