@@ -233,11 +233,7 @@ public class RobotContainer {
         .rightTrigger()
         .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED));
 
-    controller
-        .leftBumper()
-        .whileTrue(
-            shooter
-                .setAutomaticCommandRun());
+    controller.leftBumper().whileTrue(shooter.setAutomaticCommandRun());
   }
 
   /**
@@ -251,5 +247,9 @@ public class RobotContainer {
 
   public ShooterRotationManager getShooterRotationManager() {
     return shooterRotationManager;
+  }
+
+  public Drive getDrive() {
+    return drive;
   }
 }

@@ -161,9 +161,9 @@ public class FeedWhenValidCommand extends Command {
     // we don't have vision up yet here
     seesAprilTag = true;
 
-    //we don't have an accelerometer in sim
-    if(Constants.currentMode == Mode.SIM) {
-        isNotSkidding = true;
+    // we don't have an accelerometer in sim
+    if (Constants.currentMode == Mode.SIM) {
+      isNotSkidding = true;
     }
 
     // simpler check if we don't care abotu vision for whatever reason
@@ -185,9 +185,11 @@ public class FeedWhenValidCommand extends Command {
       return;
     }
 
-    isFeedable = validityTimer.hasElapsed(ShooterConstants.VALIDITY_DEBOUNCE_TIME_SEC) ||
-    //this way there won't be a wait time if the user needs it shot now
-     overrideVision.getAsBoolean();
+    isFeedable =
+        validityTimer.hasElapsed(ShooterConstants.VALIDITY_DEBOUNCE_TIME_SEC)
+            ||
+            // this way there won't be a wait time if the user needs it shot now
+            overrideVision.getAsBoolean();
   }
 
   private void log() {
