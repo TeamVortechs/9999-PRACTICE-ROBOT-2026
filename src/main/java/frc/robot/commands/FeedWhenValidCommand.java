@@ -143,9 +143,7 @@ public class FeedWhenValidCommand extends Command {
     accelerometerY = accelerometer.getY();
 
     isNotSkidding = Math.abs(accelerometerX - chassisX) < ShooterConstants.SKID_THRESHOLD && Math.abs(accelerometerY - chassisY) < ShooterConstants.SKID_THRESHOLD;
-
-
-
+ 
     // we can also check for jerk here
     //not adding skid/slip test here because this is sim
 
