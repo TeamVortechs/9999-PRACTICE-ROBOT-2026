@@ -10,6 +10,7 @@ import frc.robot.subsystems.feeder.Feeder;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterRotationManager;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 /*
 Names
@@ -30,9 +31,6 @@ public class FeedWhenValidCommand extends Command {
   /** timer since it was last valid. The code waits a certain time before it is ok to shooot */
   private Timer validityTimer;
 
-  // purely for logging purposes
-  @AutoLogOutput(key = "Commands/FeedWhenValid/validitytime")
-  private double validityTime = 0;
 
   private Feeder feeder;
 
@@ -42,6 +40,13 @@ public class FeedWhenValidCommand extends Command {
   // these are just used for validity requirements
   private Shooter shooter;
   private ShooterRotationManager shooterRotationManager;
+
+  //here for logging
+  private boolean isValid = false;
+  private boolean isFeedable = false;
+  
+  private boolean speedWithinTolerance = false;
+  private boolean isOriented = false;
 
   /**
    * @param feeder only mechanism this command contorls
@@ -74,16 +79,20 @@ public class FeedWhenValidCommand extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    //this is done this way to allow loging
+    checkCurValidity();
+    checkFeedability(isValid);
+
     log();
 
-    if (!isFeedable()) {
+    if (!isFeedable) {
       feeder.setSpeed(0);
       controller.setRumble(RumbleType.kBothRumble, 0);
       return;
     }
 
     feeder.setSpeed(FeederConstants.FEED_POWER);
-
     // purely sim feedback
     controller.setRumble(RumbleType.kBothRumble, 0.1);
   }
@@ -101,32 +110,36 @@ public class FeedWhenValidCommand extends Command {
     return false;
   }
 
-  @AutoLogOutput(key = "Commands/FeedWhenValid/isvalid")
   /** calculates wether or not it is currently ok to make a shot */
-  private boolean isValid() {
-    if (!shooter.isOnTarget()) return false;
-    if (!shooterRotationManager.isOriented()) return false;
+  private void checkCurValidity() {
+    speedWithinTolerance = shooter.isOnTarget();
+    isOriented = shooterRotationManager.isOriented();
 
     // we can also do a slip test here by comparing acceleraomter and chassis speeds
 
     // we can also check for jerk here
 
-    return true;
+    isValid = speedWithinTolerance && isOriented;
   }
 
-  @AutoLogOutput(key = "Commands/FeedWhenValid/isfeedable")
-  /** takes debounce time into consideration to see if we should we feed right away or still wait */
-  private boolean isFeedable() {
 
-    if (!isValid()) {
+  /** takes debounce time into consideration to see if we should we feed right away or still wait */
+  private void checkFeedability(boolean isValid) {
+
+    if (!isValid) {
       validityTimer.restart();
-      return false;
+      isFeedable = false;
+      return;
     }
 
-    return validityTimer.hasElapsed(ShooterConstants.VALIDITY_DEBOUNCE_TIME_SEC);
+    isFeedable = validityTimer.hasElapsed(ShooterConstants.VALIDITY_DEBOUNCE_TIME_SEC);
   }
 
   private void log() {
-    validityTime = validityTimer.get();
+    Logger.recordOutput("FeedWhenValidCommand/timer", validityTimer.get());
+    Logger.recordOutput("FeedWhenValidCommand/isCurrentlyValid", isValid);
+    Logger.recordOutput("FeedWhenValidCommand/isFeedable", isFeedable);
+    Logger.recordOutput("FeedWhenValidCommand/ShooterSpeedWithinTolerance", speedWithinTolerance);
+    Logger.recordOutput("FeedWhenValidCommand/IsOrientedCorrectly", isOriented);
   }
 }
