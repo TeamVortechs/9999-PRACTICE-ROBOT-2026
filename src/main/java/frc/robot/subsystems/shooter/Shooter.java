@@ -33,10 +33,15 @@ public class Shooter extends SubsystemBase {
   @AutoLogOutput private boolean isManual = true;
   @AutoLogOutput private double manualSpeed = 0;
 
-  //autologged like this so it can go on our dashboard
-  @AutoLogOutput(key = "Shooter/ShooterTargetSpeed") private double targetSpeed = 0;
-  @AutoLogOutput(key = "Shooter/ShooterSpeed") private double speed = 0;
-  @AutoLogOutput(key = "Shooter/ShooterIsOnTarget") private boolean isOnTarget = false;
+  // autologged like this so it can go on our dashboard
+  @AutoLogOutput(key = "Shooter/ShooterTargetSpeed")
+  private double targetSpeed = 0;
+
+  @AutoLogOutput(key = "Shooter/ShooterSpeed")
+  private double speed = 0;
+
+  @AutoLogOutput(key = "Shooter/ShooterIsOnTarget")
+  private boolean isOnTarget = false;
 
   private ShooterIO shooterIO;
   private ShooterIOInputsAutoLogged inputs;

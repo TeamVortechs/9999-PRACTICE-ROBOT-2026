@@ -65,7 +65,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
-        feeder = new Feeder(new FeederSparkIO(0));
+        feeder = new Feeder(new FeederSparkIO(Constants.FeederConstants.ID));
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -75,7 +75,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
-        shooter = new Shooter(new ShooterSparkIO(), () -> shooterRotationManager.getDistance());
+        shooter = new Shooter(new ShooterSparkIO(Constants.ShooterConstants.ID), () -> shooterRotationManager.getDistance());
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The

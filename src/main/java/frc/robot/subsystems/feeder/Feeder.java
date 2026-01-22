@@ -22,9 +22,14 @@ public class Feeder extends SubsystemBase {
   public static final double TOLERANCE = FeederConstants.TOLERANCE;
 
   // just here for the logging, done like this so we can put it on a dashboard
-  @AutoLogOutput(key = "Feeder/FeederSpeed") private double speed = 0;
-  @AutoLogOutput(key = "Feeder/FeederTargetSpeed") private double targetSpeed = 0;
-  @AutoLogOutput(key = "Feeder/IsOnTarget") private boolean isOnTarget = false;  
+  @AutoLogOutput(key = "Feeder/FeederSpeed")
+  private double speed = 0;
+
+  @AutoLogOutput(key = "Feeder/FeederTargetSpeed")
+  private double targetSpeed = 0;
+
+  @AutoLogOutput(key = "Feeder/IsOnTarget")
+  private boolean isOnTarget = false;
 
   private FeederIO feederIO;
   private FeederIOInputsAutoLogged inputs;
