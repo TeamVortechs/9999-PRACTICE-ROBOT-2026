@@ -65,7 +65,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
-        feeder = new Feeder(new FeederSparkIO(0));
+        feeder = new Feeder(new FeederSparkIO(Constants.FeederConstants.ID));
         drive =
             new Drive(
                 new GyroIOPigeon2(),
