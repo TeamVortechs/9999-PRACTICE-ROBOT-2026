@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.ChargeShooterWhenNeededCommand;
 import frc.robot.commands.DriveCommands;
@@ -65,7 +67,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
-        feeder = new Feeder(new FeederSparkIO(Constants.FeederConstants.ID));
+        feeder = new Feeder(new FeederSparkIO(FeederConstants.ID));
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -75,7 +77,7 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
-        shooter = new Shooter(new ShooterSparkIO(Constants.ShooterConstants.ID), () -> shooterRotationManager.getDistance());
+        shooter = new Shooter(new ShooterSparkIO(ShooterConstants.ID, new CANcoder(ShooterConstants.CANCODER_ID, ShooterConstants.CANCODER_CANBUS)), () -> shooterRotationManager.getDistance());
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The

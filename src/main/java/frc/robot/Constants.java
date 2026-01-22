@@ -38,6 +38,8 @@ public final class Constants {
     public static final double TOLERANCE = 0.1;
 
     public static final int ID = 22;
+    public static final int CANCODER_ID = 23;
+    public static final String CANCODER_CANBUS = "rio"; //check this lol, 1/21/26
 
     // this is higher rn cus it's in sim. We can model this as a linear function based on distance
     // if we're having trouble adjusting but right now I'm not cus it's a variable that mgiht not be
