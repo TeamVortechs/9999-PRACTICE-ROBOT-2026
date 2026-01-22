@@ -79,7 +79,22 @@ public final class Constants {
     public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
     public static final double TOLERANCE = 0.1;
 
+    // not real
     public static final int ID = 0;
+
+    public static final double FEED_POWER = 0.1;
+  }
+
+  // copied off feeder constants
+  // copied directly from ShooterConstants
+  public class BeltConstants {
+
+    // used in Belt.java
+    public static final double RAMP_RATE_VOLTS_SYSID = 0.25;
+    public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
+
+    // not real
+    public static final int ID = 6;
 
     public static final double FEED_POWER = 0.1;
   }
