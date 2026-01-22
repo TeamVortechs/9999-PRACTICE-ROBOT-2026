@@ -171,8 +171,8 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> {
               int pov = controller.getHID().getPOV();
-              if (pov == 90) return -1.0;  // D-pad right = rotate clockwise
-              if (pov == 270) return 1.0;  // D-pad left = rotate counter-clockwise
+              if (pov == 90) return -0.5;  // D-pad right = rotate clockwise
+              if (pov == 270) return 0.5;  // D-pad left = rotate counter-clockwise
               return 0.0;
             }));
 
