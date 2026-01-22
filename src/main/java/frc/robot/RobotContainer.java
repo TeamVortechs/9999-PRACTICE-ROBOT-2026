@@ -148,7 +148,6 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
-    new EventTrigger("shoot").whileTrue(Commands.print("shooting"));
     configureButtonBindings();
   }
 
@@ -159,6 +158,10 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+
+    // EVENT TRIGGERS
+
+    new EventTrigger("shoot").whileTrue(Commands.print("shooting"));
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         // DriveCommands.joystickDrive(
@@ -220,7 +223,15 @@ public class RobotContainer {
     //   e.printStackTrace();
     //   return null;
     // }
-    return autoChooser.get();
-    // return new PathPlannerAuto("auto left");
+    String osName = System.getProperty("os.name").toLowerCase();
+    if (osName.contains("win")) {
+        // Windows
+        return autoChooser.get();
+    } else if (osName.contains("nix") || osName.contains("nux")) {
+        // Linux (including roboRIO)
+        return new PathPlannerAuto("auto left");
+    } else {
+        return autoChooser.get();
+    }
   }
 }
