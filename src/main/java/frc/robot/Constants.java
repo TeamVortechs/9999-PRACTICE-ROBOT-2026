@@ -37,7 +37,7 @@ public final class Constants {
     public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
     public static final double TOLERANCE = 0.1;
 
-    public static final int ID = 1;
+    public static final int ID = 22;
 
     // this is higher rn cus it's in sim. We can model this as a linear function based on distance
     // if we're having trouble adjusting but right now I'm not cus it's a variable that mgiht not be
@@ -79,7 +79,7 @@ public final class Constants {
     public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
     public static final double TOLERANCE = 0.1;
 
-    public static final int ID = 0;
+    public static final int ID = 21;
 
     public static final double FEED_POWER = 0.1;
   }
