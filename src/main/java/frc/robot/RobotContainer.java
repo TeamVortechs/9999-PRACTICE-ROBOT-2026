@@ -8,6 +8,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -29,6 +31,8 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterRotationManager;
 import frc.robot.subsystems.shooter.ShooterSimulationIO;
 import frc.robot.subsystems.shooter.ShooterSparkIO;
+import java.io.IOException;
+import org.json.simple.parser.ParseException;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -154,11 +158,22 @@ public class RobotContainer {
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
+        // DriveCommands.joystickDrive(
+        //     drive,
+        //     () -> -controller.getLeftY(),
+        //     () -> -controller.getLeftX(),
+        //     () -> -controller.getRightX()));
+
         DriveCommands.joystickDrive(
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+            () -> {
+              int pov = controller.getHID().getPOV();
+              if (pov == 90) return -1.0;  // D-pad right = rotate clockwise
+              if (pov == 270) return 1.0;  // D-pad left = rotate counter-clockwise
+              return 0.0;
+            }));
 
     // Lock to 0° when A button is held
     controller
@@ -193,6 +208,14 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.get();
+    PathPlannerPath path;
+    try {
+      path = PathPlannerPath.fromPathFile("shoot, climb");
+      return AutoBuilder.followPath(path);
+    } catch (FileVersionException | IOException | ParseException e) {
+      e.printStackTrace();
+      return null;
+    }
+    // return autoChooser.get();
   }
 }
