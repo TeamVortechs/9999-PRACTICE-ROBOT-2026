@@ -8,6 +8,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -208,14 +209,15 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    PathPlannerPath path;
-    try {
-      path = PathPlannerPath.fromPathFile("shoot, climb");
-      return AutoBuilder.followPath(path);
-    } catch (FileVersionException | IOException | ParseException e) {
-      e.printStackTrace();
-      return null;
-    }
-    // return autoChooser.get();
+    // PathPlannerPath path;
+    // try {
+    //   path = PathPlannerPath.fromPathFile("shoot, climb");
+    //   return AutoBuilder.followPath(path);
+    // } catch (FileVersionException | IOException | ParseException e) {
+    //   e.printStackTrace();
+    //   return null;
+    // }
+    // // return autoChooser.get();
+    return new PathPlannerAuto("auto");
   }
 }
