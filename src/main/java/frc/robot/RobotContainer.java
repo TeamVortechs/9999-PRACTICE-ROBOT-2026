@@ -9,6 +9,7 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.events.EventTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -147,6 +148,7 @@ public class RobotContainer {
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
     // Configure the button bindings
+    new EventTrigger("shoot").whileTrue(Commands.print("shooting"));
     configureButtonBindings();
   }
 
@@ -203,6 +205,7 @@ public class RobotContainer {
     controller.y().onFalse(shooter.setManualSpeedCommand(0));
   }
 
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -217,7 +220,7 @@ public class RobotContainer {
     //   e.printStackTrace();
     //   return null;
     // }
-    // // return autoChooser.get();
-    return new PathPlannerAuto("auto");
+    return autoChooser.get();
+    // return new PathPlannerAuto("auto left");
   }
 }
