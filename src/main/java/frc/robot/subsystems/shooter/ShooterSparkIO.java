@@ -1,7 +1,6 @@
 package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import frc.robot.Constants;
@@ -12,7 +11,7 @@ public class ShooterSparkIO implements ShooterIO {
   private double targetSpeed = 0;
   private boolean isOnTarget = false;
 
-    public ShooterSparkIO(int id, CANcoder encoder) {
+  public ShooterSparkIO(int id, CANcoder encoder) {
     m_motor = new SparkMax(id, MotorType.kBrushed);
     m_encoder = encoder;
   }

@@ -77,7 +77,12 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
-        shooter = new Shooter(new ShooterSparkIO(ShooterConstants.ID, new CANcoder(ShooterConstants.CANCODER_ID, ShooterConstants.CANCODER_CANBUS)), () -> shooterRotationManager.getDistance());
+        shooter =
+            new Shooter(
+                new ShooterSparkIO(
+                    ShooterConstants.ID,
+                    new CANcoder(ShooterConstants.CANCODER_ID, ShooterConstants.CANCODER_CANBUS)),
+                () -> shooterRotationManager.getDistance());
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -224,18 +229,19 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    shooter.setDefaultCommand(
-        new ChargeShooterWhenNeededCommand(
-            shooter,
-            () -> drive.getPose())); // make shooter go to this speed when it's not being used
+    // shooter.setDefaultCommand(
+    //     new ChargeShooterWhenNeededCommand(
+    //         shooter,
+    //         () -> drive.getPose())); // make shooter go to this speed when it's not being used
 
-    feeder.setDefaultCommand(feeder.setSpeedRunCommand(0));
+    // feeder.setDefaultCommand(feeder.setSpeedRunCommand(0));
 
+    // this also spins the drum due to the kitbot's design
     controller
         .rightTrigger()
-        .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED));
+        .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED)).onFalse(shooter.setManualSpeedCommand(0));
 
-    controller.leftBumper().whileTrue(shooter.setAutomaticCommandRun());
+    controller.leftBumper().whileTrue(feeder.setSpeedCommand(Constants.FeederConstants.FEED_POWER)).onFalse(feeder.setSpeedCommand(0));
   }
 
   /**

@@ -69,11 +69,12 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("shooter", inputs);
 
     // calculate speed that automatically updates with distance
-    automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
-    scaledAutomaticSpeed = automaticSpeed * automaticSpeedScalar;
+    // i do not want it to automatically set speed right now. this may kill someone
+    // automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
+    // scaledAutomaticSpeed = automaticSpeed * automaticSpeedScalar;
 
-    targetSpeed = getSpeedTarget();
-    shooterIO.setSpeed(targetSpeed);
+    // targetSpeed = getSpeedTarget();
+    // shooterIO.setSpeed(targetSpeed);
 
     speed = shooterIO.getSpeed();
 
