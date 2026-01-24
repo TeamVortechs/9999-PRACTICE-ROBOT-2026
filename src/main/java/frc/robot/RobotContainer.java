@@ -10,8 +10,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -33,9 +31,12 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterRotationManager;
 import frc.robot.subsystems.shooter.ShooterSimulationIO;
 import frc.robot.subsystems.shooter.ShooterSparkIO;
-import java.io.IOException;
-import org.json.simple.parser.ParseException;
+
+import java.util.Optional;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -176,8 +177,8 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> {
               int pov = controller.getHID().getPOV();
-              if (pov == 90) return -0.5;  // D-pad right = rotate clockwise
-              if (pov == 270) return 0.5;  // D-pad left = rotate counter-clockwise
+              if (pov == 90) return -0.75; // D-pad right = rotate clockwise
+              if (pov == 270) return 0.75; // D-pad left = rotate counter-clockwise
               return 0.0;
             }));
 
@@ -208,7 +209,6 @@ public class RobotContainer {
     controller.y().onFalse(shooter.setManualSpeedCommand(0));
   }
 
-
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -225,13 +225,22 @@ public class RobotContainer {
     // }
     String osName = System.getProperty("os.name").toLowerCase();
     if (osName.contains("win")) {
-        // Windows
-        return autoChooser.get();
+      // Windows
+      return autoChooser.get();
     } else if (osName.contains("nix") || osName.contains("nux")) {
-        // Linux (including roboRIO)
-        return new PathPlannerAuto("auto left");
+      int station = DriverStation.getLocation().orElse(1);
+      switch (station) {
+        case 1:
+          return new PathPlannerAuto("auto left");
+        case 2:
+          return new PathPlannerAuto("auto middle");
+        case 3:
+          return new PathPlannerAuto("auto right");
+        default:
+          return new PathPlannerAuto("auto left");
+      }
     } else {
-        return autoChooser.get();
+      return autoChooser.get();
     }
   }
 }
