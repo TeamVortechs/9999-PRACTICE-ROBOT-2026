@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import static frc.robot.subsystems.vision.VisionConstants.robotToPhoton0;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,9 +23,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.commands.ChargeShooterWhenNeededCommand;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.FeedWhenValidCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -39,12 +39,13 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterRotationManager;
 import frc.robot.subsystems.shooter.ShooterSimulationIO;
 import frc.robot.subsystems.shooter.ShooterSparkIO;
-import java.util.function.Supplier;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
 import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -89,32 +90,13 @@ public class RobotContainer {
             new Shooter(
                 new ShooterSparkIO(
                     ShooterConstants.ID,
-                    new CANcoder(ShooterConstants.CANCODER_ID, ShooterConstants.CANCODER_CANBUS)),
-                () -> shooterRotationManager.getDistance());
+                    new CANcoder(ShooterConstants.CANCODER_ID, ShooterConstants.CANCODER_CANBUS)));
 
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOLimelight(
-                    VisionConstants.limelight0Name, () -> drive.getRotation()) {});
-
-        // The ModuleIOTalonFXS implementation provides an example implementation for
-        // TalonFXS controller connected to a CANdi with a PWM encoder. The
-        // implementations
-        // of ModuleIOTalonFX, ModuleIOTalonFXS, and ModuleIOSpark (from the Spark
-        // swerve
-        // template) can be freely intermixed to support alternative hardware
-        // arrangements.
-        // Please see the AdvantageKit template documentation for more information:
-        // https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template#custom-module-implementations
-        //
-        // drive =
-        // new Drive(
-        // new GyroIOPigeon2(),
-        // new ModuleIOTalonFXS(TunerConstants.FrontLeft),
-        // new ModuleIOTalonFXS(TunerConstants.FrontRight),
-        // new ModuleIOTalonFXS(TunerConstants.BackLeft),
-        // new ModuleIOTalonFXS(TunerConstants.BackRight));
+                new VisionIOLimelight(VisionConstants.limelight0Name, () -> drive.getRotation()),
+                new VisionIOPhotonVision(VisionConstants.photon0Name, robotToPhoton0) {});
         break;
 
       case SIM:
@@ -128,13 +110,14 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
-        shooter =
-            new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
+        shooter = new Shooter(new ShooterSimulationIO());
         vision =
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    "camera1", VisionConstants.robotToCamera0, drive::getPose) {});
+                    VisionConstants.photon0Name,
+                    VisionConstants.robotToPhoton0,
+                    drive::getPose) {});
         break;
 
       default:
@@ -148,8 +131,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
-        shooter =
-            new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
+        shooter = new Shooter(new ShooterSimulationIO());
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
@@ -193,12 +175,12 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // decrease power of controller, orient shooter face targetPose
-    Command orientDrive =
-        DriveCommands.joystickDriveAtAngle(
-            drive,
-            () -> -controller.getLeftY() * ShooterConstants.K_JOYSTICK_WHEN_SHOOTING,
-            () -> -controller.getLeftX() * ShooterConstants.K_JOYSTICK_WHEN_SHOOTING,
-            () -> shooterRotationManager.getHeading());
+    // Command orientDrive =
+    //     DriveCommands.joystickDriveAtAngle(
+    //         drive,
+    //         () -> -controller.getLeftY() * ShooterConstants.K_JOYSTICK_WHEN_SHOOTING,
+    //         () -> -controller.getLeftX() * ShooterConstants.K_JOYSTICK_WHEN_SHOOTING,
+    //         () -> shooterRotationManager.getHeading());
 
     // accelerate shooter to target speed(determined by distance), orient shooter, then start the
     // feeder to shoot
@@ -210,20 +192,34 @@ public class RobotContainer {
 
     // always orient drive and shoot at the same time... might be a little sloppy but a majority of
 
-    Command feedWhenValid =
-        new FeedWhenValidCommand(
-            feeder,
-            controller,
-            shooter,
-            shooterRotationManager,
-            drive,
-            () -> controller.a().getAsBoolean());
+    // Command feedWhenValid =
+    //     new FeedWhenValidCommand(
+    //         feeder,
+    //         controller,
+    //         shooter,
+    //         shooterRotationManager,
+    //         drive,
+    //         () -> controller.a().getAsBoolean());
 
-    // balls will make it
-    Command shootSequence =
-        Commands.parallel(orientDrive, shooter.setAutomaticCommand(), feedWhenValid);
+    // // balls will make it
+    // Command shootSequence =
+    //     Commands.parallel(orientDrive, shooter.setAutomaticCommand(), feedWhenValid);
 
-    controller.leftTrigger().whileTrue(shootSequence);
+    // controller.leftTrigger().whileTrue(shootSequence);
+
+    // this is the devin version of the robot's lookAt function; it is commented here in the case
+    // that we use it
+    controller
+        .leftTrigger()
+        .whileTrue(
+            DriveCommands.joystickDriveLookAtPose(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> // target your own team's hub
+                (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
+                        ? Constants.TargetPoses.HUB_BLUE_POSE2D
+                        : Constants.TargetPoses.HUB_RED_POSE2D)));
 
     // Lock to 0° when A button is held
     controller
@@ -259,21 +255,16 @@ public class RobotContainer {
     // this also spins the drum due to the kitbot's design
     controller
         .rightTrigger()
-        .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED)).onFalse(shooter.setManualSpeedCommand(0));
-
-    controller.leftBumper().whileTrue(feeder.setSpeedCommand(Constants.FeederConstants.FEED_POWER)).onFalse(feeder.setSpeedCommand(0));
+        .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED))
+        .onFalse(shooter.setManualSpeedCommand(0));
 
     controller
-        .leftTrigger()
+        .leftBumper()
         .whileTrue(
-            DriveCommands.joystickDriveLookAtPose(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> // target your own team's hub
-                (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
-                        ? Constants.TargetPoses.HUB_BLUE_POSE2D
-                        : Constants.TargetPoses.HUB_RED_POSE2D)));
+            feeder
+                .setSpeedCommand(Constants.FeederConstants.FEED_POWER)
+                .onlyIf(shooter::isOnTarget))
+        .onFalse(feeder.setSpeedCommand(0));
   }
 
   /**

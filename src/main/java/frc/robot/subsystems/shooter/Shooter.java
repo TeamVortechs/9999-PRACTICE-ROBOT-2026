@@ -53,8 +53,7 @@ public class Shooter extends SubsystemBase {
    * @param shooterIO the hardware interface
    * @param distanceSupplierMeters the distance supplier for when it goes automatic
    */
-  public Shooter(ShooterIO shooterIO, DoubleSupplier distanceSupplierMeters) {
-    this.distanceSupplier = distanceSupplierMeters;
+  public Shooter(ShooterIO shooterIO) {
     this.shooterIO = shooterIO;
     this.inputs = new ShooterIOInputsAutoLogged();
 

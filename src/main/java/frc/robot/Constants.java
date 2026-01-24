@@ -50,7 +50,7 @@ public final class Constants {
 
     public static final double DEFAULT_SPEED = .25; // speed intake/shooter run at default
     // speed intake/shooter boosts to
-    public static final double INTAKE_SPEED = .5;
+    public static final double INTAKE_SPEED = .4;
 
     public static final double X_POSE_TO_CHARGE = 5.5;
     public static final double PERCENTAGE_OF_DISTANCE_WHEN_CHARGING = 0.6;
