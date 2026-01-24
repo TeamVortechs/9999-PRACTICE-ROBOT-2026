@@ -159,16 +159,15 @@ public class RobotContainer {
     // EVENT TRIGGERS
 
     new EventTrigger("shoot").whileTrue(Commands.print("shoot"));
-    new EventTrigger("feeder station").whileTrue(Commands.print("at feeder station"));
-    new EventTrigger("climb").whileTrue(Commands.print("climb"));
-    new EventTrigger("shoot1l").whileTrue(Commands.print("shoot1l"));
-    new EventTrigger("shoot1m").whileTrue(Commands.print("shoot1m"));
-    new EventTrigger("shoot1r").whileTrue(Commands.print("shoot1r"));
-    new EventTrigger("feeder station1").whileTrue(Commands.print("feeder station 1"));
-    new EventTrigger("shoot2").whileTrue(Commands.print("feeder shoot"));
-    new EventTrigger("feeder-station2").whileTrue(Commands.print("feeder station 2"));
-    new EventTrigger("shoot 3").whileTrue(Commands.print("feeder station 2 shoot"));
-    new EventTrigger("climb").whileTrue(Commands.print("climbing"));
+    new EventTrigger("feeder station").whileTrue(Commands.print("at feeder station")); // first feeder station
+    new EventTrigger("shoot1l").whileTrue(Commands.print("shoot1l")); // first shoot from station 1 / left
+    new EventTrigger("shoot1m").whileTrue(Commands.print("shoot1m")); // first shoot from station 2 / middle
+    new EventTrigger("shoot1r").whileTrue(Commands.print("shoot1r")); // first shoot from station 3 / right
+    new EventTrigger("feeder station1").whileTrue(Commands.print("feeder station 1")); // first feeder station 
+    new EventTrigger("shoot2").whileTrue(Commands.print("feeder shoot")); // shooting OTW from feeder station 1 to 2
+    new EventTrigger("feeder-station2").whileTrue(Commands.print("feeder station 2")); // second feeder station, the one where you open a gate
+    new EventTrigger("shoot 3").whileTrue(Commands.print("feeder station 2 shoot")); // shooting in between feeder station 2 and climbing
+    new EventTrigger("climb").whileTrue(Commands.print("climbing")); // at climbing
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -183,9 +182,9 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> {
-              int pov = controller.getHID().getPOV();
-              if (pov == 90) return -0.75; // D-pad right = rotate clockwise
-              if (pov == 270) return 0.75; // D-pad left = rotate counter-clockwise
+              int pov = controller.getHID().getPOV(); // use dpad instead of right joystick
+              if (pov == 90) return -0.75; // turn left
+              if (pov == 270) return 0.75; // turn right
               return 0.0;
             }));
 
@@ -237,6 +236,7 @@ public class RobotContainer {
     } else if (osName.contains("nix") || osName.contains("nux")) {
       int station = DriverStation.getLocation().orElse(1);
       switch (station) {
+        // switches paths easily on linux since no smart dashboard
         case 1:
           return new PathPlannerAuto("auto left feeder station");
         case 2:
