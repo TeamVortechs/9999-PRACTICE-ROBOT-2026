@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "feeder station left"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "feeder station, feeder-shoot"
+            "pathName": "feeder station2 middle"
           }
         },
         {
@@ -25,7 +19,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "feeder-shoot, climb"
+            "pathName": "feeder station2 shoot"
           }
         },
         {
@@ -35,9 +29,39 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "reverse feeder station2 shoot"
+          }
+        },
+        {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "feeder station2 shoot"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "feeder-shoot2, climb"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
           }
         }
       ]

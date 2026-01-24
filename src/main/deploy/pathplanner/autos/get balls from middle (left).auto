@@ -7,31 +7,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "feeder station left"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "feeder station, feeder-shoot"
+            "pathName": "get balls, shoot"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 2.0
+            "waitTime": 3.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "feeder-shoot, climb"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
+            "pathName": "climb"
           }
         },
         {

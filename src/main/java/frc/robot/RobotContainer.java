@@ -182,6 +182,11 @@ public class RobotContainer {
     new EventTrigger("climb").whileTrue(Commands.print("climbing")); // at climbing
     new EventTrigger("climb and shoot")
         .whileTrue(Commands.print("climb and shoot")); // at climbing and shoot
+    new EventTrigger("climb").whileTrue(Commands.print("climb"));
+    new EventTrigger("shootnew").whileTrue(Commands.print("shoot"));
+    new EventTrigger("get balls").whileTrue(Commands.print("getting balls"));
+    new EventTrigger("done getting balls").whileTrue(Commands.print("done getting balls"));
+    new EventTrigger("feeder-shoot2").whileTrue(Commands.print("feeder-shoot2"));
 
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
@@ -252,11 +257,12 @@ public class RobotContainer {
       switch (station) {
           // switches paths easily on linux since no smart dashboard
         case 1:
-          return new PathPlannerAuto("auto left feeder station");
+          //   return new PathPlannerAuto("auto left feeder station");
+          return new PathPlannerAuto("get balls from middle (left)");
         case 2:
-          return new PathPlannerAuto("auto middle feeder station");
+          return new PathPlannerAuto("auto middle feeder station2 twice, climb");
         case 3:
-          return new PathPlannerAuto("auto right feeder station");
+          return new PathPlannerAuto("auto right feeder station2 twice, climb");
         default:
           return new PathPlannerAuto("auto left feeder station");
       }
