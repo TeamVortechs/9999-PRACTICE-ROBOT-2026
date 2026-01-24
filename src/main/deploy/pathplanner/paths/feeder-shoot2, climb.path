@@ -3,32 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.5,
-        "y": 4.0
+        "x": 1.8641930740870785,
+        "y": 2.3901469013342695
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.5007748414233646,
-        "y": 3.931730141400743
+        "x": 2.140668153953028,
+        "y": 2.7199645277945277
       },
       "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.7,
-        "y": 4.0
-      },
-      "prevControl": {
-        "x": 3.280611337146608,
-        "y": 4.005491409417201
-      },
-      "nextControl": {
-        "x": 1.3420054352239923,
-        "y": 3.9871561168988428
-      },
-      "isLocked": false,
-      "linkedName": null
+      "linkedName": "feeder-shoot2"
     },
     {
       "anchor": {
@@ -36,27 +20,22 @@
         "y": 3.7758571428571432
       },
       "prevControl": {
-        "x": 2.523141168658442,
-        "y": 4.044084506950048
+        "x": 1.7114075228230332,
+        "y": 3.269599324087078
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": "climb"
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 1,
-      "rotationDegrees": 2.2456436573757803
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "shoot",
-      "waypointRelativePos": 0.8975811907983761,
-      "endWaypointRelativePos": 1.0992155784844382,
+      "name": "climb",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
       "command": null
     }
   ],
@@ -76,7 +55,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 31.16838125671531
   },
   "useDefaultConstraints": true
 }

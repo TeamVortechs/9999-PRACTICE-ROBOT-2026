@@ -12,6 +12,7 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.EventTrigger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -31,12 +32,7 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterRotationManager;
 import frc.robot.subsystems.shooter.ShooterSimulationIO;
 import frc.robot.subsystems.shooter.ShooterSparkIO;
-
-import java.util.Optional;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -162,7 +158,18 @@ public class RobotContainer {
 
     // EVENT TRIGGERS
 
-    new EventTrigger("shoot").whileTrue(Commands.print("shooting"));
+    new EventTrigger("shoot").whileTrue(Commands.print("shoot"));
+    new EventTrigger("feeder station").whileTrue(Commands.print("at feeder station"));
+    new EventTrigger("climb").whileTrue(Commands.print("climb"));
+    new EventTrigger("shoot1l").whileTrue(Commands.print("shoot1l"));
+    new EventTrigger("shoot1m").whileTrue(Commands.print("shoot1m"));
+    new EventTrigger("shoot1r").whileTrue(Commands.print("shoot1r"));
+    new EventTrigger("feeder station1").whileTrue(Commands.print("feeder station 1"));
+    new EventTrigger("shoot2").whileTrue(Commands.print("feeder shoot"));
+    new EventTrigger("feeder-station2").whileTrue(Commands.print("feeder station 2"));
+    new EventTrigger("shoot 3").whileTrue(Commands.print("feeder station 2 shoot"));
+    new EventTrigger("climb").whileTrue(Commands.print("climbing"));
+
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         // DriveCommands.joystickDrive(
@@ -231,13 +238,13 @@ public class RobotContainer {
       int station = DriverStation.getLocation().orElse(1);
       switch (station) {
         case 1:
-          return new PathPlannerAuto("auto left");
+          return new PathPlannerAuto("auto left feeder station");
         case 2:
-          return new PathPlannerAuto("auto middle");
+          return new PathPlannerAuto("auto middle feeder station");
         case 3:
-          return new PathPlannerAuto("auto right");
+          return new PathPlannerAuto("auto right feeder station");
         default:
-          return new PathPlannerAuto("auto left");
+          return new PathPlannerAuto("auto left feeder station");
       }
     } else {
       return autoChooser.get();
