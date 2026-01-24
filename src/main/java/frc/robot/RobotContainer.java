@@ -11,6 +11,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,6 +40,11 @@ import frc.robot.subsystems.shooter.ShooterRotationManager;
 import frc.robot.subsystems.shooter.ShooterSimulationIO;
 import frc.robot.subsystems.shooter.ShooterSparkIO;
 import java.util.function.Supplier;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -52,6 +59,7 @@ public class RobotContainer {
   private final Feeder feeder;
   private final Shooter shooter;
   private final ShooterRotationManager shooterRotationManager;
+  private final Vision vision;
 
   private final Supplier<Pose2d> targetPose = () -> new Pose2d(4.76, 4, new Rotation2d());
   // Controller
@@ -83,6 +91,12 @@ public class RobotContainer {
                     ShooterConstants.ID,
                     new CANcoder(ShooterConstants.CANCODER_ID, ShooterConstants.CANCODER_CANBUS)),
                 () -> shooterRotationManager.getDistance());
+
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOLimelight(
+                    VisionConstants.limelight0Name, () -> drive.getRotation()) {});
 
         // The ModuleIOTalonFXS implementation provides an example implementation for
         // TalonFXS controller connected to a CANdi with a PWM encoder. The
@@ -116,6 +130,11 @@ public class RobotContainer {
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
         shooter =
             new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIOPhotonVisionSim(
+                    "camera1", VisionConstants.robotToCamera0, drive::getPose) {});
         break;
 
       default:
@@ -131,6 +150,7 @@ public class RobotContainer {
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
         shooter =
             new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
 
@@ -242,6 +262,18 @@ public class RobotContainer {
         .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED)).onFalse(shooter.setManualSpeedCommand(0));
 
     controller.leftBumper().whileTrue(feeder.setSpeedCommand(Constants.FeederConstants.FEED_POWER)).onFalse(feeder.setSpeedCommand(0));
+
+    controller
+        .leftTrigger()
+        .whileTrue(
+            DriveCommands.joystickDriveLookAtPose(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> // target your own team's hub
+                (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
+                        ? Constants.TargetPoses.HUB_BLUE_POSE2D
+                        : Constants.TargetPoses.HUB_RED_POSE2D)));
   }
 
   /**

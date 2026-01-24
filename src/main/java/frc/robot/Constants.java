@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -84,5 +86,10 @@ public final class Constants {
     public static final int ID = 21;
 
     public static final double FEED_POWER = 0.1;
+  }
+
+  public class TargetPoses {
+    public static final Pose2d HUB_RED_POSE2D = new Pose2d(11.864594, 4.034536, new Rotation2d());
+    public static final Pose2d HUB_BLUE_POSE2D = new Pose2d(4.574794, 4.034536, new Rotation2d());
   }
 }
