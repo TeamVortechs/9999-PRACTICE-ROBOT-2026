@@ -7,19 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shoot1l"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "shoot1l, feeder station"
+            "pathName": "feeder station left"
           }
         },
         {
@@ -49,19 +37,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "feeder station2, feeder-shoot2"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "feeder-shoot2, climb"
+            "pathName": "feeder station2, shoot and climb"
           }
         },
         {

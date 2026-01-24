@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 1.8641930740870785,
-        "y": 2.3901469013342695
+        "x": 1.5808749999999998,
+        "y": 3.7758571428571432
       },
       "prevControl": {
-        "x": 1.6494042475012898,
-        "y": 2.262218171277648
+        "x": 2.20710467872191,
+        "y": 3.131343925561797
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "feeder-shoot2"
+      "linkedName": "climb"
     }
   ],
   "rotationTargets": [],
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [
     {
-      "name": "shoot3",
+      "name": "climb and shoot",
       "waypointRelativePos": 1.0,
       "endWaypointRelativePos": null,
       "command": null
@@ -49,7 +49,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 31.16838125671531
+    "rotation": 179.225779835072
   },
   "reversed": false,
   "folder": null,
