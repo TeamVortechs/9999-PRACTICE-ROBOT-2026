@@ -27,6 +27,7 @@ public class FeederSparkIO implements FeederIO {
    * sets speed -1 to 1
    */
   public void setSpeed(double speed) {
+    System.out.println("feeder spark received speed: " + speed);
     targetSpeed = speed;
     m_motor.set(speed);
   }

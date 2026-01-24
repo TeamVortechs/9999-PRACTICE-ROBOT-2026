@@ -39,7 +39,7 @@ public final class Constants {
     public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
     public static final double TOLERANCE = 0.1;
 
-    public static final int ID = 22;
+    public static final int ID = 21;
     public static final int CANCODER_ID = 23;
     public static final String CANCODER_CANBUS = "rio";
 
@@ -50,7 +50,7 @@ public final class Constants {
 
     public static final double DEFAULT_SPEED = .25; // speed intake/shooter run at default
     // speed intake/shooter boosts to
-    public static final double INTAKE_SPEED = .4;
+    public static final double INTAKE_SPEED = 1;
 
     public static final double X_POSE_TO_CHARGE = 5.5;
     public static final double PERCENTAGE_OF_DISTANCE_WHEN_CHARGING = 0.6;
@@ -83,9 +83,9 @@ public final class Constants {
     public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
     public static final double TOLERANCE = 0.1;
 
-    public static final int ID = 21;
+    public static final int ID = 22;
 
-    public static final double FEED_POWER = 0.1;
+    public static final double FEED_POWER = 1;
   }
 
   public class TargetPoses {

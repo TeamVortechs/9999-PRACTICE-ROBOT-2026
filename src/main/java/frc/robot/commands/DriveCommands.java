@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 public class DriveCommands {
   private static final double DEADBAND = 0.1;
   private static final double ANGLE_KP = 5.0;
-  private static final double ANGLE_KD = 0.4;
+  private static final double ANGLE_KD = 0;
   private static final double ANGLE_MAX_VELOCITY = 8.0;
   private static final double ANGLE_MAX_ACCELERATION = 20.0;
   private static final double FF_START_DELAY = 2.0; // Secs
@@ -159,7 +159,8 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Supplier<Pose2d> targetPoseSupplier) {
+      Supplier<Pose2d> targetPoseSupplier,
+      Rotation2d finalRotationOffset) {
 
     // Create PID controller
     ProfiledPIDController angleController =
@@ -183,7 +184,7 @@ public class DriveCommands {
               Translation2d targetCoords = targetPoseSupplier.get().getTranslation();
 
               Translation2d robotToTarget = targetCoords.minus(robotCoords);
-              rotationGoal = robotToTarget.getAngle();
+              rotationGoal = robotToTarget.getAngle().plus(finalRotationOffset);
 
               double omega =
                   angleController.calculate(

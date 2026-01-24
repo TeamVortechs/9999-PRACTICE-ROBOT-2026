@@ -100,8 +100,10 @@ public class Shooter extends SubsystemBase {
    * @param speed the speed the flywheel will pid too
    */
   public void setManualSpeed(double speed) {
+    System.out.println("shooter manual speed sent:" + speed);
     this.isManual = true;
     this.manualSpeed = speed;
+    shooterIO.setSpeed(speed);
   }
 
   /**

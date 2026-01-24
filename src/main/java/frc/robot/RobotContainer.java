@@ -207,6 +207,17 @@ public class RobotContainer {
 
     // controller.leftTrigger().whileTrue(shootSequence);
 
+    // dpad down resets the gyro
+    controller
+        .povDown()
+        .onTrue(
+            Commands.runOnce(
+                    () ->
+                        drive.setPose(
+                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                    drive)
+                .ignoringDisable(true));
+
     // this is the devin version of the robot's lookAt function; it is commented here in the case
     // that we use it
     controller
@@ -219,7 +230,8 @@ public class RobotContainer {
                 () -> // target your own team's hub
                 (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
                         ? Constants.TargetPoses.HUB_BLUE_POSE2D
-                        : Constants.TargetPoses.HUB_RED_POSE2D)));
+                        : Constants.TargetPoses.HUB_RED_POSE2D),
+                new Rotation2d(-Math.PI)));
 
     // Lock to 0° when A button is held
     controller
@@ -255,15 +267,16 @@ public class RobotContainer {
     // this also spins the drum due to the kitbot's design
     controller
         .rightTrigger()
-        .whileTrue(shooter.setManualSpeedRunCommand(Constants.ShooterConstants.INTAKE_SPEED))
+        .whileTrue(shooter.setManualSpeedCommand(Constants.ShooterConstants.INTAKE_SPEED))
         .onFalse(shooter.setManualSpeedCommand(0));
 
     controller
-        .leftBumper()
+        .rightBumper()
         .whileTrue(
-            feeder
-                .setSpeedCommand(Constants.FeederConstants.FEED_POWER)
-                .onlyIf(shooter::isOnTarget))
+            feeder.setSpeedCommand(Constants.FeederConstants.FEED_POWER)
+            // only be able to feed if shooter is at speed and trying to spin
+            // .onlyIf(() -> (shooter.isOnTarget() && (shooter.getSpeedTarget() != 0)))
+            )
         .onFalse(feeder.setSpeedCommand(0));
   }
 
