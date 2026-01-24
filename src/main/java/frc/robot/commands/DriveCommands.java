@@ -159,7 +159,6 @@ public class DriveCommands {
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      Supplier<Pose2d> robotPoseSupplier,
       Supplier<Pose2d> targetPoseSupplier) {
 
     // Create PID controller
@@ -180,7 +179,7 @@ public class DriveCommands {
 
               // Calculate angular speed
               Rotation2d rotationGoal;
-              Translation2d robotCoords = robotPoseSupplier.get().getTranslation();
+              Translation2d robotCoords = drive.getPose().getTranslation();
               Translation2d targetCoords = targetPoseSupplier.get().getTranslation();
 
               Translation2d robotToTarget = targetCoords.minus(robotCoords);

@@ -188,7 +188,6 @@ public class RobotContainer {
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                drive::getPose,
                 () -> // target your own team's hub
                 (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
                         ? Constants.TargetPoses.HUB_BLUE_POSE2D
