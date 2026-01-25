@@ -107,11 +107,17 @@ public class Vision extends SubsystemBase {
                 || observation.pose().getY() < 0.0
                 || observation.pose().getY() > aprilTagLayout.getFieldWidth();
 
-        // if we're in testing mode, accept all poses so that we can have properly logged robot data
+        // if we're in testing mode, accept poses that extend out of the field boundaries but still
+        // use the basic filtering
         // use "RobotPosesAccepted or RobotPosesRejected" in AdvantageScope to see which ones are
         // good in normal operation
         if (DriverStation.isTest()) {
-          rejectPose = false;
+          rejectPose =
+              observation.tagCount() == 0 // Must have at least one tag
+                  || (observation.tagCount() == 1
+                      && observation.ambiguity() > maxAmbiguity) // Cannot be high ambiguity
+                  || Math.abs(observation.pose().getZ())
+                      > maxZError; // Must have realistic Z coordinate
         }
 
         // Add pose to log
