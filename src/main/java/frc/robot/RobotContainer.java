@@ -231,7 +231,7 @@ public class RobotContainer {
                 (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
                         ? Constants.TargetPoses.HUB_BLUE_POSE2D
                         : Constants.TargetPoses.HUB_RED_POSE2D),
-                new Rotation2d(-Math.PI)));
+                new Rotation2d(-Math.PI / 2)));
 
     // Lock to 0° when A button is held
     controller
@@ -265,19 +265,19 @@ public class RobotContainer {
     // feeder.setDefaultCommand(feeder.setSpeedRunCommand(0));
 
     // this also spins the drum due to the kitbot's design
-    controller
-        .rightTrigger()
-        .whileTrue(shooter.setManualSpeedCommand(Constants.ShooterConstants.INTAKE_SPEED))
-        .onFalse(shooter.setManualSpeedCommand(0));
+    // controller
+    //     .rightTrigger()
+    //     .whileTrue(shooter.setManualSpeedCommand(-Constants.ShooterConstants.INTAKE_SPEED))
+    //     .onFalse(shooter.setManualSpeedCommand(0));
 
-    controller
-        .rightBumper()
-        .whileTrue(
-            feeder.setSpeedCommand(Constants.FeederConstants.FEED_POWER)
-            // only be able to feed if shooter is at speed and trying to spin
-            // .onlyIf(() -> (shooter.isOnTarget() && (shooter.getSpeedTarget() != 0)))
-            )
-        .onFalse(feeder.setSpeedCommand(0));
+    // controller
+    //     .rightBumper()
+    //     .whileTrue(
+    //         feeder.setSpeedCommand(Constants.FeederConstants.FEED_POWER)
+    //         // only be able to feed if shooter is at speed and trying to spin
+    //         // .onlyIf(() -> (shooter.isOnTarget() && (shooter.getSpeedTarget() != 0)))
+    //         )
+    //     .onFalse(feeder.setSpeedCommand(0));
   }
 
   /**
