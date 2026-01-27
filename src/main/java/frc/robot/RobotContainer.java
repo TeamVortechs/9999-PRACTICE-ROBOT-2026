@@ -11,14 +11,17 @@ import static frc.robot.subsystems.vision.VisionConstants.robotToPhoton0;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FeederConstants;
@@ -90,7 +93,8 @@ public class RobotContainer {
             new Shooter(
                 new ShooterSparkIO(
                     ShooterConstants.ID,
-                    new CANcoder(ShooterConstants.CANCODER_ID, ShooterConstants.CANCODER_CANBUS)));
+                    new CANcoder(ShooterConstants.CANCODER_ID, ShooterConstants.CANCODER_CANBUS)),
+                () -> shooterRotationManager.getDistance());
 
         vision =
             new Vision(
@@ -110,7 +114,8 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
-        shooter = new Shooter(new ShooterSimulationIO());
+        shooter =
+            new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         vision =
             new Vision(
                 drive::addVisionMeasurement,
@@ -131,7 +136,8 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         shooterRotationManager = new ShooterRotationManager(targetPose, drive);
-        shooter = new Shooter(new ShooterSimulationIO());
+        shooter =
+            new Shooter(new ShooterSimulationIO(), () -> shooterRotationManager.getDistance());
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {});
         break;
     }
@@ -256,6 +262,38 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
                     drive)
                 .ignoringDisable(true));
+
+    Pose2d targetPose = new Pose2d(14.386, 3.567, Rotation2d.fromDegrees(180));
+
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints =
+        new PathConstraints(3, 2, Units.degreesToRadians(0), Units.degreesToRadians(720));
+
+    // Since AutoBuilder is configured, we can use it to build pathfinding commands
+    Command pathfindingCommand =
+        AutoBuilder.pathfindToPose(
+            targetPose, constraints, 0.0 // Goal end velocity in meters/sec
+            );
+
+    Command feedCommand = feeder.setSpeedCommand(1);
+
+    feeder.setDefaultCommand(feeder.setSpeedCommand(0));
+
+    controller
+        .a()
+        .whileTrue(
+            Commands.parallel(
+                pathfindingCommand,
+                new WaitUntilCommand(
+                        () ->
+                            targetPose
+                                    .getTranslation()
+                                    .getDistance(drive.getPose().getTranslation())
+                                < 0.5)
+                    .andThen(feedCommand),
+                shooter.setManualSpeedRunCommand(100)));
+
+    shooter.setDefaultCommand(shooter.setManualSpeedCommand(0));
 
     // shooter.setDefaultCommand(
     //     new ChargeShooterWhenNeededCommand(

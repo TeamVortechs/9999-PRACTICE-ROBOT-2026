@@ -53,9 +53,10 @@ public class Shooter extends SubsystemBase {
    * @param shooterIO the hardware interface
    * @param distanceSupplierMeters the distance supplier for when it goes automatic
    */
-  public Shooter(ShooterIO shooterIO) {
+  public Shooter(ShooterIO shooterIO, DoubleSupplier distanceSupplier) {
     this.shooterIO = shooterIO;
     this.inputs = new ShooterIOInputsAutoLogged();
+    this.distanceSupplier = distanceSupplier;
 
     this.distToSpeedTable = new InterpolatingDoubleTreeMap();
     // TO DO: populate distToSpeedTable with real valeus
@@ -69,11 +70,11 @@ public class Shooter extends SubsystemBase {
 
     // calculate speed that automatically updates with distance
     // i do not want it to automatically set speed right now. this may kill someone
-    // automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
-    // scaledAutomaticSpeed = automaticSpeed * automaticSpeedScalar;
+    automaticSpeed = getSpeedFromDistance(distanceSupplier.getAsDouble());
+    scaledAutomaticSpeed = automaticSpeed * automaticSpeedScalar;
 
-    // targetSpeed = getSpeedTarget();
-    // shooterIO.setSpeed(targetSpeed);
+    targetSpeed = getSpeedTarget();
+    shooterIO.setSpeed(targetSpeed);
 
     speed = shooterIO.getSpeed();
 

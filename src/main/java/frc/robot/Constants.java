@@ -81,11 +81,11 @@ public final class Constants {
     // used in Shooter.java
     public static final double RAMP_RATE_VOLTS_SYSID = 0.25;
     public static final double DYNAMIC_STEP_VOLTS_SYSID = 1;
-    public static final double TOLERANCE = 0.1;
+    public static final double TOLERANCE = 50;
 
     public static final int ID = 22;
 
-    public static final double FEED_POWER = 1;
+    public static final double FEED_POWER = 1.5;
   }
 
   public class TargetPoses {

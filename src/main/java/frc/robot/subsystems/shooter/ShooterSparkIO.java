@@ -3,6 +3,7 @@ package frc.robot.subsystems.shooter;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.Constants;
 
 public class ShooterSparkIO implements ShooterIO {
@@ -10,6 +11,8 @@ public class ShooterSparkIO implements ShooterIO {
   private CANcoder m_encoder;
   private double targetSpeed = 0;
   private boolean isOnTarget = false;
+
+  private PIDController pidController = new PIDController(0.5, 2, 0);
 
   public ShooterSparkIO(int id, CANcoder encoder) {
     m_motor = new SparkMax(id, MotorType.kBrushed);
@@ -23,6 +26,10 @@ public class ShooterSparkIO implements ShooterIO {
 
     inputs.targetSpeed = targetSpeed;
     inputs.isOnTarget = isOnTarget;
+
+    double voltage = pidController.calculate(getSpeed(), targetSpeed);
+
+    setVoltage(voltage);
   }
 
   /*
@@ -31,7 +38,6 @@ public class ShooterSparkIO implements ShooterIO {
   public void setSpeed(double speed) {
     System.out.println("shooter spark received speed: " + speed);
     targetSpeed = speed;
-    m_motor.set(speed);
   }
 
   public void stop() {
