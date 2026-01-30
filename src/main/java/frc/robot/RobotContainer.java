@@ -214,15 +214,24 @@ public class RobotContainer {
     // controller.leftTrigger().whileTrue(shootSequence);
 
     // dpad down resets the gyro
-    controller
-        .povDown()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+    // controller
+    //     .povDown()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+    //                 drive)
+    //             .ignoringDisable(true));
+
+    // !!!!!! TEMP LINE !!!!!!
+    SysIdRoutine sysShooter = shooter.BuildSysIdRoutine();
+    shooter.configureSysIdBindings(controller, sysShooter);
+    // binds are on the BUTTONS THIS TIME BECAUSE POV IS TRASH
+    // a: dynamic forward
+    // b: dynamic reverse
+    // x: quasi forward
+    // y: quasi reverse
 
     // this is the devin version of the robot's lookAt function; it is commented here in the case
     // that we use it
@@ -239,29 +248,30 @@ public class RobotContainer {
                         : Constants.TargetPoses.HUB_RED_POSE2D),
                 new Rotation2d(-Math.PI / 2)));
 
-    // Lock to 0° when A button is held
-    controller
-        .rightStick()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+    // // Lock to 0° when A button is held
+    // uh, this is on R3? i am very suspicious of this line
+    // controller
+    //     .rightStick()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> Rotation2d.kZero));
 
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // // Switch to X pattern when X button is pressed
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+    // // Reset gyro to 0° when B button is pressed
+    // controller
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+    //                 drive)
+    //             .ignoringDisable(true));
 
     Pose2d targetPose = new Pose2d(14.386, 3.567, Rotation2d.fromDegrees(180));
 

@@ -29,7 +29,7 @@ public class ShooterSparkIO implements ShooterIO {
 
     double voltage = pidController.calculate(getSpeed(), targetSpeed);
 
-    setVoltage(voltage);
+    // setVoltage(voltage);
   }
 
   /*
