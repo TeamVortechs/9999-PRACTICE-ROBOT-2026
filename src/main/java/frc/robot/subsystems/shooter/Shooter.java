@@ -74,7 +74,7 @@ public class Shooter extends SubsystemBase {
     scaledAutomaticSpeed = automaticSpeed * automaticSpeedScalar;
 
     targetSpeed = getSpeedTarget();
-    shooterIO.setSpeed(targetSpeed);
+    // shooterIO.setSpeed(targetSpeed);
 
     speed = shooterIO.getSpeed();
 
@@ -101,10 +101,10 @@ public class Shooter extends SubsystemBase {
    * @param speed the speed the flywheel will pid too
    */
   public void setManualSpeed(double speed) {
-    System.out.println("shooter manual speed sent:" + speed);
+    // System.out.println("shooter manual speed sent:" + speed);
     this.isManual = true;
     this.manualSpeed = speed;
-    shooterIO.setSpeed(speed);
+    // shooterIO.setSpeed(speed);
   }
 
   /**
@@ -244,10 +244,10 @@ public class Shooter extends SubsystemBase {
    * @param sysIdRoutine the routine that this controller will activate
    */
   public void configureSysIdBindings(CommandXboxController controller, SysIdRoutine sysIdRoutine) {
-    controller.povUp().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
-    controller.povDown().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
-    controller.povRight().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
-    controller.povLeft().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
+    controller.y().whileTrue(sysIdRoutine.dynamic(Direction.kForward));
+    controller.a().whileTrue(sysIdRoutine.dynamic(Direction.kReverse));
+    controller.b().whileTrue(sysIdRoutine.quasistatic(Direction.kForward));
+    controller.x().whileTrue(sysIdRoutine.quasistatic(Direction.kReverse));
   }
 }
 

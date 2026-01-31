@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -74,6 +75,8 @@ public class Robot extends LoggedRobot {
     // and put our autonomous chooser on the dashboard.
     robotContainer = new RobotContainer();
     SmartDashboard.putData("field", m_field);
+
+    SignalLogger.setPath("/media/sda1/test/");
   }
 
   /** This function is called periodically during all modes. */
@@ -96,11 +99,15 @@ public class Robot extends LoggedRobot {
     m_field.setRobotPose(robotContainer.getDrive().getPose());
     // Return to non-RT thread priority (do not modify the first argument)
     // Threads.setCurrentThreadPriority(false, 10);
+
   }
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+
+    SignalLogger.stop();
+  }
 
   /** This function is called periodically when disabled. */
   @Override
@@ -131,6 +138,8 @@ public class Robot extends LoggedRobot {
     if (autonomousCommand != null) {
       autonomousCommand.cancel();
     }
+
+    SignalLogger.start();
   }
 
   /** This function is called periodically during operator control. */

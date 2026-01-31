@@ -62,7 +62,7 @@ public class Feeder extends SubsystemBase {
    * @param speed the speed the flywheel will pid too
    */
   public void setSpeed(double speed) {
-    System.out.println("feeder manual speed sent:" + speed);
+    // System.out.println("feeder manual speed sent:" + speed);
     this.targetSpeed = speed;
   }
 

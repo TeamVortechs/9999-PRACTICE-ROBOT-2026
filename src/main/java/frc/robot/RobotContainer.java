@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
@@ -68,6 +69,7 @@ public class RobotContainer {
   private final Supplier<Pose2d> targetPose = () -> new Pose2d(4.76, 4, new Rotation2d());
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
+  private final CommandXboxController sysIDController = new CommandXboxController(1);
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
@@ -241,13 +243,13 @@ public class RobotContainer {
 
     // Lock to 0° when A button is held
     controller
-        .rightStick()
+        .rightBumper()
         .whileTrue(
             DriveCommands.joystickDriveAtAngle(
                 drive,
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+                () -> Rotation2d.fromDegrees(45)));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -293,7 +295,12 @@ public class RobotContainer {
                     .andThen(feedCommand),
                 shooter.setManualSpeedRunCommand(100)));
 
-    shooter.setDefaultCommand(shooter.setManualSpeedCommand(0));
+    // shooter.setDefaultCommand(shooter.setManualSpeedCommand(0));
+
+    sysIDController.x().whileTrue(drive.sysIdDynamic(Direction.kForward));
+    sysIDController.b().whileTrue(drive.sysIdDynamic(Direction.kReverse));
+    sysIDController.y().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+    sysIDController.y().whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
     // shooter.setDefaultCommand(
     //     new ChargeShooterWhenNeededCommand(
