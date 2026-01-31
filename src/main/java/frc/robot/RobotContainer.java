@@ -8,6 +8,7 @@
 package frc.robot;
 
 import static frc.robot.subsystems.vision.VisionConstants.robotToPhoton0;
+import static frc.robot.subsystems.vision.VisionConstants.robotToPhoton1;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -96,7 +97,8 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOLimelight(VisionConstants.limelight0Name, () -> drive.getRotation()),
-                new VisionIOPhotonVision(VisionConstants.photon0Name, robotToPhoton0) {});
+                new VisionIOPhotonVision(VisionConstants.photon0Name, robotToPhoton0),
+                new VisionIOPhotonVision(VisionConstants.photon1Name, robotToPhoton1));
         break;
 
       case SIM:
@@ -115,9 +117,9 @@ public class RobotContainer {
             new Vision(
                 drive::addVisionMeasurement,
                 new VisionIOPhotonVisionSim(
-                    VisionConstants.photon0Name,
-                    VisionConstants.robotToPhoton0,
-                    drive::getPose) {});
+                    VisionConstants.photon0Name, VisionConstants.robotToPhoton0, drive::getPose),
+                new VisionIOPhotonVisionSim(
+                    VisionConstants.photon1Name, VisionConstants.robotToPhoton1, drive::getPose));
         break;
 
       default:

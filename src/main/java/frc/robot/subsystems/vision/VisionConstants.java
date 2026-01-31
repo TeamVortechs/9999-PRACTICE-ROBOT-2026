@@ -11,6 +11,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 
 public class VisionConstants {
   // AprilTag layout
@@ -19,16 +20,19 @@ public class VisionConstants {
 
   // Camera names, must match names configured on coprocessor
   public static String limelight0Name = "limelight";
-  //   public static String camera1Name = "camera_1";
   public static String photon0Name = "Arducam_Left";
+  public static String photon1Name = "Arducam_Right";
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)
   // (instead used by the vision simulation)
   public static Transform3d robotToPhoton0 =
       new Transform3d(-0.381, -0.05715, 0.2794, new Rotation3d(0.0, -0.506145483, Math.PI / 2));
-  //   public static Transform3d robotToCamera1 =
-  //       new Transform3d(-0.2, 0.0, 0.2, new Rotation3d(0.0, -0.4, Math.PI));
+  public static Transform3d
+      robotToPhoton1 = // !! WARNING !! rough estimates. i punched this in at 9:10 PM; recheck
+          // better
+          new Transform3d(
+              -0.381, -0.03215, 0.3494, new Rotation3d(0.0, -Units.degreesToRadians(29), 0));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
