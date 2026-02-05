@@ -74,7 +74,7 @@ public class Shooter extends SubsystemBase {
     scaledAutomaticSpeed = automaticSpeed * automaticSpeedScalar;
 
     targetSpeed = getSpeedTarget();
-    // shooterIO.setSpeed(targetSpeed);
+    shooterIO.setSpeed(targetSpeed);
 
     speed = shooterIO.getSpeed();
 

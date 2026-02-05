@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
@@ -242,14 +241,6 @@ public class RobotContainer {
                 new Rotation2d(-Math.PI / 2)));
 
     // Lock to 0° when A button is held
-    controller
-        .rightBumper()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.fromDegrees(45)));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -295,12 +286,12 @@ public class RobotContainer {
                     .andThen(feedCommand),
                 shooter.setManualSpeedRunCommand(100)));
 
-    // shooter.setDefaultCommand(shooter.setManualSpeedCommand(0));
+    shooter.setDefaultCommand(shooter.setManualSpeedCommand(0));
 
-    sysIDController.x().whileTrue(drive.sysIdDynamic(Direction.kForward));
-    sysIDController.b().whileTrue(drive.sysIdDynamic(Direction.kReverse));
-    sysIDController.y().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
-    sysIDController.y().whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
+    // sysIDController.x().whileTrue(drive.sysIdDynamic(Direction.kForward));
+    // sysIDController.b().whileTrue(drive.sysIdDynamic(Direction.kReverse));
+    // sysIDController.y().whileTrue(drive.sysIdQuasistatic(Direction.kForward));
+    // sysIDController.y().whileTrue(drive.sysIdQuasistatic(Direction.kReverse));
 
     // shooter.setDefaultCommand(
     //     new ChargeShooterWhenNeededCommand(
@@ -323,9 +314,12 @@ public class RobotContainer {
     //         // .onlyIf(() -> (shooter.isOnTarget() && (shooter.getSpeedTarget() != 0)))
     //         )
     //     .onFalse(feeder.setSpeedCommand(0));
+
+    controller.rightTrigger().whileTrue(shooter.setManualSpeedRunCommand(-80));
+    controller.rightBumper().whileTrue(feeder.setSpeedRunCommand(1));
   }
 
-  /**
+  /**       
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous

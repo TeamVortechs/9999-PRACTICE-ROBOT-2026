@@ -49,7 +49,6 @@ public class Feeder extends SubsystemBase {
 
     // calculate speed that automatically updates with distance
 
-    targetSpeed = getSpeedTarget();
     speed = feederIO.getSpeed();
     isOnTarget = isOnTarget();
 

@@ -12,7 +12,7 @@ public class ShooterSparkIO implements ShooterIO {
   private double targetSpeed = 0;
   private boolean isOnTarget = false;
 
-  private PIDController pidController = new PIDController(0.5, 2, 0);
+  private PIDController pidController = new PIDController(1.2, 15, 0);
 
   public ShooterSparkIO(int id, CANcoder encoder) {
     m_motor = new SparkMax(id, MotorType.kBrushed);
@@ -29,7 +29,11 @@ public class ShooterSparkIO implements ShooterIO {
 
     double voltage = pidController.calculate(getSpeed(), targetSpeed);
 
-    // setVoltage(voltage);
+    if (targetSpeed == 0) {
+      setVoltage(0);
+    } else {
+      setVoltage(voltage);
+    }
   }
 
   /*
