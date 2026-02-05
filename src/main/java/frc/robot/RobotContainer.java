@@ -233,7 +233,7 @@ public class RobotContainer {
                 (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
                         ? Constants.TargetPoses.HUB_BLUE_POSE2D
                         : Constants.TargetPoses.HUB_RED_POSE2D),
-                new Rotation2d(-Math.PI / 2)));
+                new Rotation2d(-(Math.PI + Math.toRadians(5)))));
 
     // Lock to 0° when A button is held
     controller

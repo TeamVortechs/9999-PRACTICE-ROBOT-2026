@@ -27,12 +27,13 @@ public class VisionConstants {
   // (Not used by Limelight, configure in web UI instead)
   // (instead used by the vision simulation)
   public static Transform3d robotToPhoton0 =
-      new Transform3d(-0.381, -0.05715, 0.2794, new Rotation3d(0.0, -0.506145483, Math.PI / 2));
+      new Transform3d(
+          -0.381, -0.05715, 0.2794, new Rotation3d(0.0, -Units.degreesToRadians(27), Math.PI / 2));
   public static Transform3d
       robotToPhoton1 = // !! WARNING !! rough estimates. i punched this in at 9:10 PM; recheck
           // better
           new Transform3d(
-              -0.381, -0.03215, 0.3494, new Rotation3d(0.0, -Units.degreesToRadians(29), 0));
+              -0.381, -0.03215, 0.3494, new Rotation3d(0.0, -Units.degreesToRadians(35), Math.PI));
 
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.3;
