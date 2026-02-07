@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -100,7 +101,13 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    // throttle the limelight on disabled initiation
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(200);
+    // also, set it to the apriltag pipeline (i don't want to touch the neural network pipeline)
+    // unthrottle the limelight on autonomous init
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
+  }
 
   /** This function is called periodically when disabled. */
   @Override
@@ -109,6 +116,8 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    // unthrottle the limelight on autonomous init
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(0);
     autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -124,6 +133,8 @@ public class Robot extends LoggedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
+    // unthrottle the limelight on teleop init
+    NetworkTableInstance.getDefault().getTable("limelight").getEntry("throttle_set").setNumber(0);
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
