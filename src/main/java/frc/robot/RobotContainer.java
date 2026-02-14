@@ -25,8 +25,8 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.LED_strip.LEDStrip;
-import frc.robot.subsystems.LED_strip.LEDStripAnimation;
 import frc.robot.subsystems.LED_strip.LEDStripIO;
+import frc.robot.subsystems.LED_strip.LEDStripTalonFXIO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -78,8 +78,8 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
-        // ledStrip = new LEDStrip(new LEDStripTalonFXIO(10));
-        ledStrip = new LEDStripAnimation();
+        ledStrip = new LEDStrip(new LEDStripTalonFXIO(10));
+        // ledStrip = new LEDStripAnimation();
         feeder = new Feeder(new FeederSparkIO(FeederConstants.ID));
         drive =
             new Drive(
