@@ -24,6 +24,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.LED_strip.LEDStrip;
+import frc.robot.subsystems.LED_strip.LEDStripIO;
 import frc.robot.subsystems.LED_strip.LEDStripTalonFXIO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -61,7 +62,7 @@ public class RobotContainer {
   private final Shooter shooter;
   private final ShooterRotationManager shooterRotationManager;
   private final Vision vision;
-
+  private final LEDStrip ledStrip;
   private final Supplier<Pose2d> targetPose = () -> new Pose2d(4.76, 4, new Rotation2d());
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -71,12 +72,12 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    new LEDStrip(new LEDStripTalonFXIO(0));
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
+        ledStrip = new LEDStrip(new LEDStripTalonFXIO(10));
         feeder = new Feeder(new FeederSparkIO(FeederConstants.ID));
         drive =
             new Drive(
@@ -102,6 +103,7 @@ public class RobotContainer {
         break;
 
       case SIM:
+        ledStrip = new LEDStrip(new LEDStripIO() {});
         // Sim robot, instantiate physics sim IO implementations
         feeder = new Feeder(new FeederSimulationIO());
         drive =
@@ -123,6 +125,7 @@ public class RobotContainer {
         break;
 
       default:
+        ledStrip = new LEDStrip(new LEDStripIO() {});
         feeder = new Feeder(new FeederIO() {});
         // Replayed robot, disable IO implementations
         drive =
@@ -259,7 +262,7 @@ public class RobotContainer {
     //                 drive)
     //             .ignoringDisable(true));
 
-    // shooter.setDefaultCommand(
+    // shooter.setDefaultCommand([]\
     //     new ChargeShooterWhenNeededCommand(
     //         shooter,
     //         () -> drive.getPose())); // make shooter go to this speed when it's not being used
