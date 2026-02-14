@@ -10,14 +10,17 @@ package frc.robot;
 import static frc.robot.subsystems.vision.VisionConstants.robotToPhoton0;
 import static frc.robot.subsystems.vision.VisionConstants.robotToPhoton1;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.RGBWColor;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FeederConstants;
@@ -25,6 +28,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.LED_strip.LEDStrip;
+import frc.robot.subsystems.LED_strip.LEDStrip.LEDStripAnimations;
 import frc.robot.subsystems.LED_strip.LEDStripIO;
 import frc.robot.subsystems.LED_strip.LEDStripTalonFXIO;
 import frc.robot.subsystems.drive.Drive;
@@ -63,7 +67,7 @@ public class RobotContainer {
   private final Shooter shooter;
   private final ShooterRotationManager shooterRotationManager;
   private final Vision vision;
-  private final SubsystemBase ledStrip;
+  private final LEDStrip ledStrip;
   private final Supplier<Pose2d> targetPose = () -> new Pose2d(4.76, 4, new Rotation2d());
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -78,7 +82,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
-        ledStrip = new LEDStrip(new LEDStripTalonFXIO(10));
+        ledStrip = new LEDStrip(new LEDStripTalonFXIO(10, new CANBus("rio"), 100));
         // ledStrip = new LEDStripAnimation();
         feeder = new Feeder(new FeederSparkIO(FeederConstants.ID));
         drive =
@@ -173,6 +177,16 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    ledStrip.setDefaultCommand(
+        ledStrip
+            .flashBetweenColorsCommand(1, new RGBWColor(Color.kOrange), new RGBWColor(Color.kWhite))
+            .ignoringDisable(true));
+
+    controller
+        .a()
+        .whileTrue(
+            new InstantCommand(
+                () -> ledStrip.setAnimation(LEDStripAnimations.m_slot0Animation), ledStrip));
     // Default command, normal field-relative drive
     // drive.setDefaultCommand(
     //     DriveCommands.joystickDrive(

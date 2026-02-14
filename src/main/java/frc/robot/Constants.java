@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.CANBus;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -41,7 +42,7 @@ public final class Constants {
 
     public static final int ID = 21;
     public static final int CANCODER_ID = 23;
-    public static final String CANCODER_CANBUS = "rio";
+    public static final CANBus CANCODER_CANBUS = new CANBus("rio");
 
     // this is higher rn cus it's in sim. We can model this as a linear function based on distance
     // if we're having trouble adjusting but right now I'm not cus it's a variable that mgiht not be
