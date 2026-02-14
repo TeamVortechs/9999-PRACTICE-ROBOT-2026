@@ -17,6 +17,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FeederConstants;
@@ -24,8 +25,8 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.LED_strip.LEDStrip;
+import frc.robot.subsystems.LED_strip.LEDStripAnimation;
 import frc.robot.subsystems.LED_strip.LEDStripIO;
-import frc.robot.subsystems.LED_strip.LEDStripTalonFXIO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -62,7 +63,7 @@ public class RobotContainer {
   private final Shooter shooter;
   private final ShooterRotationManager shooterRotationManager;
   private final Vision vision;
-  private final LEDStrip ledStrip;
+  private final SubsystemBase ledStrip;
   private final Supplier<Pose2d> targetPose = () -> new Pose2d(4.76, 4, new Rotation2d());
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -77,7 +78,8 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         // ModuleIOTalonFX is intended for modules with TalonFX drive, TalonFX turn, and
         // a CANcoder
-        ledStrip = new LEDStrip(new LEDStripTalonFXIO(10));
+        // ledStrip = new LEDStrip(new LEDStripTalonFXIO(10));
+        ledStrip = new LEDStripAnimation();
         feeder = new Feeder(new FeederSparkIO(FeederConstants.ID));
         drive =
             new Drive(
