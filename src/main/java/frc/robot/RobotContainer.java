@@ -14,18 +14,17 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.LED_strip.LEDStrip;
+import frc.robot.subsystems.LED_strip.LEDStripTalonFXIO;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -72,6 +71,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    new LEDStrip(new LEDStripTalonFXIO(0));
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -169,12 +169,12 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+    // drive.setDefaultCommand(
+    //     DriveCommands.joystickDrive(
+    //         drive,
+    //         () -> -controller.getLeftY(),
+    //         () -> -controller.getLeftX(),
+    //         () -> -controller.getRightX()));
 
     // decrease power of controller, orient shooter face targetPose
     // Command orientDrive =
@@ -210,54 +210,54 @@ public class RobotContainer {
     // controller.leftTrigger().whileTrue(shootSequence);
 
     // dpad down resets the gyro
-    controller
-        .povDown()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+    // controller
+    //     .povDown()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+    //                 drive)
+    //             .ignoringDisable(true));
 
     // this is the devin version of the robot's lookAt function; it is commented here in the case
     // that we use it
-    controller
-        .leftTrigger()
-        .whileTrue(
-            DriveCommands.joystickDriveLookAtPose(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> // target your own team's hub
-                (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
-                        ? Constants.TargetPoses.HUB_BLUE_POSE2D
-                        : Constants.TargetPoses.HUB_RED_POSE2D),
-                new Rotation2d(-(Math.PI + Math.toRadians(5)))));
+    // controller
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveLookAtPose(
+    //             drive,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> // target your own team's hub
+    //             (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
+    //                     ? Constants.TargetPoses.HUB_BLUE_POSE2D
+    //                     : Constants.TargetPoses.HUB_RED_POSE2D),
+    //             new Rotation2d(-(Math.PI + Math.toRadians(5)))));
 
     // Lock to 0° when A button is held
-    controller
-        .rightStick()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
+    // controller
+    //     .rightStick()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> Rotation2d.kZero));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
-                    drive)
-                .ignoringDisable(true));
+    // controller
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), Rotation2d.kZero)),
+    //                 drive)
+    //             .ignoringDisable(true));
 
     // shooter.setDefaultCommand(
     //     new ChargeShooterWhenNeededCommand(
