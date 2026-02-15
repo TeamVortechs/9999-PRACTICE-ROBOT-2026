@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FeederConstants;
@@ -178,15 +179,16 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     ledStrip.setDefaultCommand(
-        ledStrip
-            .flashBetweenColorsCommand(1, new RGBWColor(Color.kOrange), new RGBWColor(Color.kWhite))
-            .ignoringDisable(true));
+        ledStrip.flashBetweenColorsCommand(
+            1, new RGBWColor(Color.kOrange), new RGBWColor(Color.kWhite)));
 
     controller
         .a()
         .whileTrue(
-            new InstantCommand(
-                () -> ledStrip.setAnimation(LEDStripAnimations.m_slot0Animation), ledStrip));
+            new RunCommand(
+                    () -> ledStrip.setAnimation(LEDStripAnimations.m_slot0Animation), ledStrip)
+                .ignoringDisable(true))
+        .onFalse(new InstantCommand(() -> ledStrip.clearAnimationSlot(0)).ignoringDisable(true));
     // Default command, normal field-relative drive
     // drive.setDefaultCommand(
     //     DriveCommands.joystickDrive(

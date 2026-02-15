@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Hertz;
 
 import com.ctre.phoenix6.controls.ColorFlowAnimation;
 import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.controls.EmptyAnimation;
 import com.ctre.phoenix6.signals.AnimationDirectionValue;
 import com.ctre.phoenix6.signals.RGBWColor;
 import edu.wpi.first.wpilibj.Timer;
@@ -25,7 +26,7 @@ public class LEDStrip extends SubsystemBase {
 
   public static class LEDStripAnimations {
     public static final ColorFlowAnimation m_slot0Animation =
-        new ColorFlowAnimation(0, 7)
+        new ColorFlowAnimation(0, 100)
             .withSlot(0)
             .withColor(new RGBWColor(255, 179, 26, 0))
             .withDirection(AnimationDirectionValue.Forward)
@@ -34,9 +35,9 @@ public class LEDStrip extends SubsystemBase {
 
   public LEDStrip(LEDStripIO ledStripIO) {
     this.ledStripIO = ledStripIO;
-    timer = new Timer();
-    timer.reset();
-    timer.start();
+    // timer = new Timer();
+    // timer.reset();
+    // timer.start();
 
     // orangeColor.Color = new RGBWColor(Color.kOrange);
 
@@ -62,11 +63,14 @@ public class LEDStrip extends SubsystemBase {
     ledStripIO.setAnimation(animation);
   }
 
+  public void clearAnimationSlot(int slot) {
+    ledStripIO.setAnimation(new EmptyAnimation(slot));
+  }
+
   int colorIndex = 0;
 
   public Command flashBetweenColorsCommand(double timeDelay, RGBWColor... color) {
     colorIndex = 0;
-    new InstantCommand() {};
 
     return new InstantCommand(
             () -> {
@@ -77,6 +81,7 @@ public class LEDStrip extends SubsystemBase {
               }
             },
             this)
-        .andThen(new WaitCommand(timeDelay));
+        .andThen(new WaitCommand(timeDelay))
+        .ignoringDisable(true);
   }
 }

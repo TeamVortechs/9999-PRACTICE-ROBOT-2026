@@ -3,10 +3,13 @@ package frc.robot.subsystems.LED_strip;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.CANdleConfigurator;
+import com.ctre.phoenix6.configs.LEDConfigs;
 import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.controls.SolidColor;
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.RGBWColor;
+import com.ctre.phoenix6.signals.StripTypeValue;
 
 public class LEDStripTalonFXIO implements LEDStripIO {
   private CANdle candle;
@@ -21,6 +24,9 @@ public class LEDStripTalonFXIO implements LEDStripIO {
     // for blinking
     this.candle = new CANdle(id, canbus);
     this.length = length;
+    CANdleConfigurator candleConfigurator = candle.getConfigurator();
+    LEDConfigs ledConfigs = new LEDConfigs().withStripType(StripTypeValue.GRBW);
+    candleConfigurator.apply(ledConfigs);
 
     // for animation
     // kCANBus = new CANBus("rio");
