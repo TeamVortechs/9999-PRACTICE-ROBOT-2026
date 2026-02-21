@@ -15,8 +15,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.FeederConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.PathfindToPoseCommand;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -218,27 +217,25 @@ public class RobotContainer {
     controller
         .povDown()
         .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
+            Commands.runOnce(() -> drive.setPose(new Pose2d(0, 0, new Rotation2d())), drive)
                 .ignoringDisable(true));
 
     // this is the devin version of the robot's lookAt function; it is commented here in the case
     // that we use it
-    controller
-        .leftTrigger()
-        .whileTrue(
-            DriveCommands.joystickDriveLookAtPose(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> // target your own team's hub
-                (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
-                        ? Constants.TargetPoses.HUB_BLUE_POSE2D
-                        : Constants.TargetPoses.HUB_RED_POSE2D),
-                new Rotation2d(-Math.PI / 2)));
+    // controller
+    //     .leftTrigger()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveLookAtPose(
+    //             drive,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> // target your own team's hub
+    //             (DriverStation.getAlliance().orElseThrow() == Alliance.Blue
+    //                     ? Constants.TargetPoses.HUB_BLUE_POSE2D
+    //                     : Constants.TargetPoses.HUB_RED_POSE2D),
+    //             new Rotation2d(-Math.PI / 2)));
+
+    controller.leftTrigger().whileTrue(new PathfindToPoseCommand(drive, () -> new Pose2d(), false));
 
     // Lock to 0° when A button is held
 
@@ -319,7 +316,7 @@ public class RobotContainer {
     controller.rightBumper().whileTrue(feeder.setSpeedRunCommand(1));
   }
 
-  /**       
+  /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
